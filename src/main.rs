@@ -1,3 +1,7 @@
+use {cl_chess::args::Args, clap::Parser};
+
 fn main() {
-    cl_chess::run();
+    let args = Args::parse();
+
+    cl_chess::run(args);
 }
