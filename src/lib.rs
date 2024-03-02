@@ -2,6 +2,8 @@ use {args::Args, std::{error::Error, io}};
 
 pub mod args;
 pub mod text;
+pub mod parse;
+pub mod board;
 
 pub fn run(_args: Args) {
     println!("{}", text::intro);
@@ -31,9 +33,9 @@ pub fn run(_args: Args) {
 
 }
 
-fn wait_for_enter(input: &mut String) {
+fn wait_for_enter(input: &mut String) -> Result<(), Box<dyn Error>> {
     println!("Press enter to continue . . .");
-    get_input(input);
+    get_input(input)?;
 }
 
 fn get_input(buf: &mut String) -> Result<(), Box<dyn Error>> {
@@ -41,5 +43,5 @@ fn get_input(buf: &mut String) -> Result<(), Box<dyn Error>> {
     //     println!("Unexpected input error: {}", err);
     //     process::exit(1);
     // });
-    io::stdin().read_line(buf)?
+    io::stdin().read_line(buf)
 }
