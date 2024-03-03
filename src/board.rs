@@ -1,105 +1,84 @@
-use {ascii::PIECES_ASCII, std::error::Error};
+use {
+    ascii::{Tile, PIECES_ASCII},
+    std::error::Error,
+};
 
 mod ascii;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord)]
-pub struct Board([[Tile; 8]; 8]);
+pub struct Board([[Option<Piece>; 8]; 8]);
 
 impl Board {
     pub fn new() -> Self {
         Self([
             [
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
+                Some(Piece::Rook(PieceColor::Black)),
+                Some(Piece::Knight(PieceColor::Black)),
+                Some(Piece::Bishop(PieceColor::Black)),
+                Some(Piece::Queen(PieceColor::Black)),
+                Some(Piece::King(PieceColor::Black)),
+                Some(Piece::Bishop(PieceColor::Black)),
+                Some(Piece::Knight(PieceColor::Black)),
+                Some(Piece::Rook(PieceColor::Black)),
             ],
             [
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
+                Some(Piece::Pawn(PieceColor::Black)),
+                Some(Piece::Pawn(PieceColor::Black)),
+                Some(Piece::Pawn(PieceColor::Black)),
+                Some(Piece::Pawn(PieceColor::Black)),
+                Some(Piece::Pawn(PieceColor::Black)),
+                Some(Piece::Pawn(PieceColor::Black)),
+                Some(Piece::Pawn(PieceColor::Black)),
+                Some(Piece::Pawn(PieceColor::Black)),
+            ],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            [
+                Some(Piece::Pawn(PieceColor::White)),
+                Some(Piece::Pawn(PieceColor::White)),
+                Some(Piece::Pawn(PieceColor::White)),
+                Some(Piece::Pawn(PieceColor::White)),
+                Some(Piece::Pawn(PieceColor::White)),
+                Some(Piece::Pawn(PieceColor::White)),
+                Some(Piece::Pawn(PieceColor::White)),
+                Some(Piece::Pawn(PieceColor::White)),
             ],
             [
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
+                Some(Piece::Rook(PieceColor::White)),
+                Some(Piece::Knight(PieceColor::White)),
+                Some(Piece::Bishop(PieceColor::White)),
+                Some(Piece::Queen(PieceColor::White)),
+                Some(Piece::King(PieceColor::White)),
+                Some(Piece::Bishop(PieceColor::White)),
+                Some(Piece::Knight(PieceColor::White)),
+                Some(Piece::Rook(PieceColor::White)),
             ],
-            [
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-            ],
-            [
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-            ],
-            [
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-            ],
-            [
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-            ],
-            [
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-                Tile::White(None),
-                Tile::Black(None),
-            ],
+            // [None, None, None, None, None, None, None, None],
+            // [None, None, None, None, None, None, None, None],
+            // [None, None, None, None, None, None, None, None],
+            // [None, None, None, None, None, None, None, None],
         ])
     }
 
     pub fn print(&self) -> Result<(), Box<dyn Error>> {
-        for val in self.0 {
-            for i in 0..5 {
-                for j in 0..8 {
+        for (i, val) in self.0.iter().enumerate() {
+            for j in 0..5 {
+                for k in 0..8 {
                     print!(
                         "{}",
                         PIECES_ASCII
-                            .get(&val[j])
-                            .ok_or("Failed to retrieve data (001)")?[i]
+                            .get(
+                                &(if (((i % 2) == 0) && ((k % 2) == 0))
+                                    || (((i % 2) != 0) && ((k % 2) != 0))
+                                {
+                                    Tile::White(val[k])
+                                } else {
+                                    Tile::Black(val[k])
+                                })
+                            )
+                            .ok_or("Failed to retrieve data (001)")?[j]
                     );
                 }
                 println!();
@@ -118,16 +97,16 @@ impl Default for Board {
 #[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub enum Piece {
     // ordered by point amount
-    Pawn,
-    Knight,
-    Bishop,
-    Rook,
-    Queen,
-    King,
+    Pawn(PieceColor),
+    Knight(PieceColor),
+    Bishop(PieceColor),
+    Rook(PieceColor),
+    Queen(PieceColor),
+    King(PieceColor),
 }
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
-pub enum Tile {
-    Black(Option<Piece>),
-    White(Option<Piece>),
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
+pub enum PieceColor {
+    Black,
+    White,
 }
