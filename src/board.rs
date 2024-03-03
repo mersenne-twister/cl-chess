@@ -71,6 +71,7 @@ impl Board {
         } else {
             ascii::BORDER_LINE_LETTERS_REVERSED
         })
+        .custom_color(ascii::BORDER_TEXT.into())
         .on_custom_color(ascii::BORDER_BACKGROUND.into());
 
         println!(
@@ -121,6 +122,7 @@ impl Board {
                 println!(
                     "{}",
                     format!("{}{}{}", "  ", number, "  ")
+                        .custom_color(ascii::BORDER_TEXT.into())
                         .on_custom_color(ascii::BORDER_BACKGROUND.into())
                 );
             }
