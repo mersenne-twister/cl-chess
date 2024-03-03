@@ -1,6 +1,6 @@
 use {
     args::Args,
-    board::Board,
+    board::{Board, PieceColor},
     colored::Colorize,
     std::{error::Error, io},
 };
@@ -35,7 +35,7 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
 
     wait_for_enter(&mut input)?;
 
-    Board::new().print()?;
+    Board::new().print(&PieceColor::White)?;
 
     // move:
     // move a piece

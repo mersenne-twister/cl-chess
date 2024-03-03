@@ -62,8 +62,17 @@ impl Board {
         ])
     }
 
-    pub fn print(&self) -> Result<(), Box<dyn Error>> {
-        for (i, val) in self.0.iter().enumerate() {
+    pub fn print(&self, rotation: &PieceColor) -> Result<(), Box<dyn Error>> {
+        // casting to a trait object is required because both possible values
+        // must have the same type
+        let iter: Box<dyn Iterator<Item = (usize, &[Option<Piece>; 8])>>;
+        if let PieceColor::Black = *rotation {
+            iter = Box::new(self.0.iter().rev().enumerate()) as Box<dyn Iterator<Item = _>>;
+        } else {
+            iter = Box::new(self.0.iter().enumerate()) as Box<dyn Iterator<Item = _>>;
+        }
+
+        for (i, val) in iter {
             for j in 0..5 {
                 for k in 0..8 {
                     print!(
