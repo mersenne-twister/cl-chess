@@ -24,12 +24,35 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
         input.clear();
         get_input(&mut input)?;
 
-        match input.as_str() {
-            "help" => println!("{}", text::HELP),
+        let input = input.to_ascii_lowercase(); // this keeps the string from being dropped
+        let mut input = input.as_str().split_ascii_whitespace();
+        match input.next().unwrap_or("") {
+            "move" => match input.next().unwrap_or("default") {
+                piece @ ("pawn" | "knight" | "bishop" | "rook" | "queen" | "king") => {
+                    todo!();
+                }
+                "default" => {
+                    println!("`move` command requires arguments. Enter `help` for details.");
+                    continue;
+                }
+                position => {
+                    todo!();
+
+                    println!(
+                        "Invalid argument. Expected piece name or position.\nEnter 'help' to see Help.");
+                }
+            },
+            "check" => todo!(),
+            "hint" => todo!(),
+            "help" => {
+                println!("{}", text::HELP);
+                continue;
+            }
             "" => {
                 board.print(&turn)?;
                 continue;
             }
+            "fuck" => (), // debug command
             _ => {
                 println!("Enter 'help' to see Help.");
                 continue;
@@ -41,6 +64,7 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
         } else {
             PieceColor::White
         });
+        board.print(&turn);
     }
 
     Ok(())
