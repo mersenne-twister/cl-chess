@@ -1,8 +1,8 @@
-pub const intro: &str = "\
+pub const INTRO: &str = "\
 Welcome to cl-chess, made by Iris Teyssier!
 iris.teyssier@gmail.com
 
 commands:";
 
-pub const help: &str = "\
+pub const HELP: &str = "\
 ";
