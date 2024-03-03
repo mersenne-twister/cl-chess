@@ -39,6 +39,13 @@ pub const BORDER_TEXT: Rgb = Rgb::new(255, 255, 255);
 pub const PIECE_BLACK: Rgb = Rgb::new(0, 0, 0);
 pub const PIECE_WHITE: Rgb = Rgb::new(255, 255, 255);
 
+pub const BORDER_LINE_BLANK: &str =
+    "                                                                                  ";
+pub const BORDER_LINE_LETTERS: &str =
+    "         A        B        C        D        E        F        G        H         ";
+pub const BORDER_LINE_LETTERS_REVERSED: &str =
+    "         H        G        F        E        D        C        B        A         ";
+
 fn make_hashmap() -> HashMap<Tile, [String; 5]> {
     let mut pieces_ascii = HashMap::new();
 
