@@ -11,36 +11,36 @@ pub mod parse;
 pub mod text;
 
 pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
-    println!("{}", text::INTRO);
+    println!("{}\n{}", text::INTRO, text::HELP);
 
     let mut input = String::new();
     wait_for_enter(&mut input)?;
-    Board::new().print(&PieceColor::White)?;
+    let mut turn = PieceColor::White;
+    let mut board = Board::new();
+    board.print(&turn)?;
 
-    // move:
-    // move a piece
-    // usage:
-    // `move [piece-name] [position]`
-    // `move [position] [position]`
-    // if only one piece of that name can move there, move it
-    // otherwise print error requiring `move [position] [position]` format
-    // UNAMBIGOUS
-
-    // check:
-    // see the effect of moving a piece (without actually moving it)
-    // usage:
-    // `move [piece-name] [position]`
-    // `move [position] [position]`
-
-    // hint:
-    // get a (questionable) hint on where to move
-    // usage:
-    // `hint`
-
-    
     loop {
+        println!("{}'s turn:", turn);
         input.clear();
-        get_input(&mut input);
+        get_input(&mut input)?;
+
+        match input.as_str() {
+            "help" => println!("{}", text::HELP),
+            "" => {
+                board.print(&turn)?;
+                continue;
+            }
+            _ => {
+                println!("Enter 'help' to see Help.");
+                continue;
+            }
+        }
+
+        turn = (if turn == PieceColor::White {
+            PieceColor::Black
+        } else {
+            PieceColor::White
+        });
     }
 
     Ok(())
