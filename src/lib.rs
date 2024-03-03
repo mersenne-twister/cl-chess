@@ -1,5 +1,6 @@
 use {
     args::Args,
+    board::Board,
     colored::Colorize,
     std::{error::Error, io},
 };
@@ -9,7 +10,7 @@ pub mod board;
 pub mod parse;
 pub mod text;
 
-pub fn run(_args: Args) {
+pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
     // println!("control");
     // println!("{}", "blue".blue());
     // println!("{}", "red on blue".red().on_blue());
@@ -28,9 +29,13 @@ pub fn run(_args: Args) {
     //         .on_bright_white()
     // );
 
-    println!("{}", text::intro);
+    println!("{}", text::INTRO);
 
     let mut input = String::new();
+
+    wait_for_enter(&mut input)?;
+
+    Board::new().print()?;
 
     // move:
     // move a piece
@@ -50,6 +55,8 @@ pub fn run(_args: Args) {
     // get a (questionable) hint on where to move
     // usage:
     // `hint`
+
+    Ok(())
 }
 
 fn wait_for_enter(input: &mut String) -> Result<(), Box<dyn Error>> {
