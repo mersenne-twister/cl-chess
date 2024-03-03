@@ -91,6 +91,109 @@
 ###???###         #########         #########         #########         #########   :::   
 ##?????## |______|#########         #########         #########         #########  :::::  
 
+#   #   #
+#########
+  #####  
+ ####### 
+#########
+
+         
+         
+    ##   
+    ##   
+    ##   
+OR
+*
+         
+    #    
+   ###   
+    #    
+   ###   
+
+         
+  # # #  
+  #####  
+   ###   
+  #####  
+OR
+*
+  # # # 
+  #####  
+   ###   
+   ###   
+  #####  
+
+    ##   
+  #####  
+ ## #### 
+   ####  
+  #####  
+
+    #    
+   ###   
+   ###   
+    #    
+  #####  
+
+    #    
+  #####  
+   ###   
+    #    
+   ###   
+  #####  
+OR
+    #    
+   ###   
+    #    
+    #    
+   ###   
+  #####  
+OR
+         
+ #  #  # 
+  # # #  
+   ###   
+  #####  
+OR
+*
+ #  #  # 
+  # # #  
+   ###   
+   ###   
+  #####  
+OR
+ #  #  # 
+  # # #  
+   ###   
+   ###   
+   ###   
+  #####  
+
+*
+    #    
+  ## ##  
+ #  #  # 
+  #   #  
+  #####  
+OR
+    #    
+ ## # ## 
+#  # #  #
+ #     # 
+  #####  
+OR
+    #    
+   ###   
+    #    
+   ###   
+   ###   
+  #####  
+OR
+    #    
+   ###   
+    #    
+   ###   
+  #####  
 
 https://www.google.com/search?q=chess+pieces+ascii+art&rlz=1C1GCEA_enUS1099US1099&oq=chess+pieces+ascii+art&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTINCAEQABiGAxiABBiKBTINCAIQABiGAxiABBiKBTINCAMQABiGAxiABBiKBTINCAQQABiGAxiABBiKBdIBCDU3MThqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8
 
