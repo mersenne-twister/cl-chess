@@ -1,7 +1,7 @@
 use {
     ascii::{Tile, PIECES_ASCII},
     colored::Colorize,
-    std::{error::Error, fmt::Display},
+    std::{error::Error, fmt::Display, mem::swap},
 };
 
 mod ascii;
@@ -142,6 +142,72 @@ impl Default for Board {
     }
 }
 
+pub struct Position<'a> {
+    letter: char,
+    num: u8,
+    piece: &'a mut Option<Piece>,
+}
+
+impl<'a> Position<'a> {
+    pub fn from_piece(board: &Board, piece: &'a Piece) -> Result<Self, BoardError> {
+        // Err("Could not unambigously identify piece.\n use `move [position] [position]` format.")
+        Err(BoardError::AmbigousMatch) // TODO
+    }
+
+    pub fn from_str(board: &'a mut Board, str: &str) -> Result<Self, Box<dyn Error>> {
+        if str.len() == 2 {
+            let str = str.split_at(1);
+            let (letter, num) = (str.0.to_ascii_lowercase().parse::<char>()?, str.1.parse()?);
+
+            if letter.is_ascii_alphabetic() && (letter < 'h') && (1..=8).contains(&num) {
+                return Ok(Self {
+                    letter,
+                    num,
+                    piece: &mut board.0[letter as usize][num as usize],
+                });
+            }
+        }
+        Err(Box::new(BoardError::ParseError))
+    }
+
+    fn has_piece(&self) -> bool {
+        self.piece.is_some()
+    }
+
+    fn swap(&mut self, position: &mut Position) {
+        swap(self.piece, position.piece);
+    }
+}
+
+#[derive(Debug)]
+pub enum BoardError {
+    ParseError,
+    AmbigousMatch,
+}
+
+impl Display for BoardError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            BoardError::ParseError => write!(f, "Parse error"),
+            BoardError::AmbigousMatch => write!(f, "Ambigous match"),
+        }
+    }
+}
+
+impl Error for BoardError {
+    fn cause(&self) -> Option<&dyn Error> {
+        todo!();
+    }
+
+    fn description(&self) -> &str {
+        todo!();
+    }
+
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        todo!();
+    }
+}
+
 #[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
 pub enum Piece {
     // ordered by point amount
@@ -151,6 +217,20 @@ pub enum Piece {
     Rook(PieceColor),
     Queen(PieceColor),
     King(PieceColor),
+}
+
+impl Piece {
+    fn from_str(str: &str, color: PieceColor) -> Result<Self, BoardError> {
+        match str.to_ascii_lowercase().as_str() {
+            "pawn" => Ok(Piece::Pawn(color)),
+            "knight" => Ok(Piece::Knight(color)),
+            "bishop" => Ok(Piece::Bishop(color)),
+            "rook" => Ok(Piece::Rook(color)),
+            "queen" => Ok(Piece::Queen(color)),
+            "king" => Ok(Piece::King(color)),
+            _ => Err(BoardError::ParseError),
+        }
+    }
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
