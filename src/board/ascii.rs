@@ -11,13 +11,41 @@ pub enum Tile {
     White(Option<Piece>),
 }
 
+pub struct Rgb {
+    r: u8,
+    g: u8,
+    b: u8,
+}
+
+impl Rgb {
+    pub const fn new(r: u8, g: u8, b: u8) -> Self {
+        Self { r, g, b }
+    }
+}
+
+impl From<Rgb> for CustomColor {
+    fn from(rgb: Rgb) -> Self {
+        CustomColor::new(rgb.r, rgb.g, rgb.b)
+    }
+}
+
+// done so that these are accessible from board.rs
+// pub const BOARD_BLACK: Rgb = Rgb::new(216, 135, 85);
+pub const BOARD_BLACK: Rgb = Rgb::new(177, 97, 60);
+// pub const BOARD_WHITE: Rgb = Rgb::new(254, 210, 169);
+pub const BOARD_WHITE: Rgb = Rgb::new(240, 195, 128);
+pub const BORDER_BACKGROUND: Rgb = Rgb::new(122, 77, 49);
+pub const BORDER_TEXT: Rgb = Rgb::new(255, 255, 255);
+pub const PIECE_BLACK: Rgb = Rgb::new(0, 0, 0);
+pub const PIECE_WHITE: Rgb = Rgb::new(255, 255, 255);
+
 fn make_hashmap() -> HashMap<Tile, [String; 5]> {
     let mut pieces_ascii = HashMap::new();
 
-    let board_black = CustomColor::new(216, 135, 85);
-    let board_white = CustomColor::new(254, 210, 169);
-    let piece_black = CustomColor::new(0, 0, 0);
-    let piece_white = CustomColor::new(255, 255, 255);
+    let board_black = BOARD_BLACK.into();
+    let board_white = BOARD_WHITE.into();
+    let piece_black = PIECE_BLACK.into();
+    let piece_white = PIECE_WHITE.into();
 
     let blank = [
         vec!["         "],
