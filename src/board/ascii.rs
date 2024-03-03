@@ -33,8 +33,10 @@ impl From<Rgb> for CustomColor {
 // pub const BOARD_BLACK: Rgb = Rgb::new(216, 135, 85);
 pub const BOARD_BLACK: Rgb = Rgb::new(177, 97, 60);
 // pub const BOARD_WHITE: Rgb = Rgb::new(254, 210, 169);
-pub const BOARD_WHITE: Rgb = Rgb::new(240, 195, 128);
-pub const BORDER_BACKGROUND: Rgb = Rgb::new(122, 77, 49);
+// pub const BOARD_WHITE: Rgb = Rgb::new(240, 195, 128);
+pub const BOARD_WHITE: Rgb = Rgb::new(235, 178, 94);
+// pub const BORDER_BACKGROUND: Rgb = Rgb::new(122, 77, 49);
+pub const BORDER_BACKGROUND: Rgb = Rgb::new(82, 46, 22);
 pub const BORDER_TEXT: Rgb = Rgb::new(255, 255, 255);
 pub const PIECE_BLACK: Rgb = Rgb::new(0, 0, 0);
 pub const PIECE_WHITE: Rgb = Rgb::new(255, 255, 255);
