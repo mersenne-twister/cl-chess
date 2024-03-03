@@ -11,30 +11,10 @@ pub mod parse;
 pub mod text;
 
 pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
-    // println!("control");
-    // println!("{}", "blue".blue());
-    // println!("{}", "red on blue".red().on_blue());
-    // println!("{}", "bold".bold());
-    // println!(
-    //     "{} {} {}",
-    //     "cyan".cyan(),
-    //     "italic yellow".italic().yellow(),
-    //     "cyan".cyan()
-    // );
-    // println!("{}", "yellow blue red".yellow().blue().red());
-    // println!(
-    //     "{}",
-    //     "bright blue on bright white"
-    //         .bright_blue()
-    //         .on_bright_white()
-    // );
-
     println!("{}", text::INTRO);
 
     let mut input = String::new();
-
     wait_for_enter(&mut input)?;
-
     Board::new().print(&PieceColor::White)?;
 
     // move:
@@ -56,6 +36,12 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
     // get a (questionable) hint on where to move
     // usage:
     // `hint`
+
+    
+    loop {
+        input.clear();
+        get_input(&mut input);
+    }
 
     Ok(())
 }
