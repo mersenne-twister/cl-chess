@@ -1,5 +1,6 @@
 use {
     ascii::{Tile, PIECES_ASCII},
+    colored::Colorize,
     std::error::Error,
 };
 
@@ -63,6 +64,20 @@ impl Board {
     }
 
     pub fn print(&self, rotation: &PieceColor) -> Result<(), Box<dyn Error>> {
+        let border_line_blank =
+            ascii::BORDER_LINE_BLANK.on_custom_color(ascii::BORDER_BACKGROUND.into());
+        let border_line_letters = (if *rotation == PieceColor::White {
+            ascii::BORDER_LINE_LETTERS
+        } else {
+            ascii::BORDER_LINE_LETTERS_REVERSED
+        })
+        .on_custom_color(ascii::BORDER_BACKGROUND.into());
+
+        println!(
+            "{}\n{}\n{}",
+            border_line_blank, border_line_letters, border_line_blank
+        );
+
         // casting to a trait object is required because both possible values
         // must have the same type
         let iter: Box<dyn Iterator<Item = (usize, &[Option<Piece>; 8])>>;
@@ -71,9 +86,22 @@ impl Board {
         } else {
             iter = Box::new(self.0.iter().enumerate()) as Box<dyn Iterator<Item = _>>;
         }
-
         for (i, val) in iter {
             for j in 0..5 {
+                let number = if j == 2 {
+                    if *rotation == PieceColor::Black {
+                        (i + 1).to_string()
+                    } else {
+                        ((i as isize) - 8).abs().to_string()
+                    }
+                } else {
+                    " ".to_string()
+                };
+                print!(
+                    "{}",
+                    format!("{}{}{}", "  ", number, "  ")
+                        .on_custom_color(ascii::BORDER_BACKGROUND.into())
+                );
                 for k in 0..8 {
                     print!(
                         "{}",
@@ -90,9 +118,18 @@ impl Board {
                             .ok_or("Failed to retrieve data (001)")?[j]
                     );
                 }
-                println!();
+                println!(
+                    "{}",
+                    format!("{}{}{}", "  ", number, "  ")
+                        .on_custom_color(ascii::BORDER_BACKGROUND.into())
+                );
             }
         }
+        println!(
+            "{}\n{}\n{}",
+            border_line_blank, border_line_letters, border_line_blank
+        );
+
         Ok(())
     }
 }
