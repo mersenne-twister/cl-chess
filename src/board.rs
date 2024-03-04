@@ -134,6 +134,50 @@ impl Board {
 
         Ok(())
     }
+
+    pub fn swap(&mut self, first: &Position, second: &Position) {
+        // swap(self.get(first), self.get(second));
+        // self.get(first)
+
+        // self.0[first.num as usize][first.letter as usize].swap
+        // self.0.swap()
+
+        if first.num == second.num {
+            self.0[first.num as usize].swap(first.letter as usize, second.letter as usize);
+        } else {
+            // let (first, second) = if first.num > second.num {
+            //     // let arr = self.0.split_at_mut(second.num as usize);
+            // } else {
+            //     // self.0.split_at_mut(first.num as usize)
+            // };
+
+            let (first, second) = if first.num > second.num {
+                let arr = self.0.split_at_mut(first.num as usize);
+                (&mut arr.1[0][first.letter as usize], &mut arr.0[second.num as usize][second.letter as usize])
+            } else {
+                let arr = self.0.split_at_mut(second.num as usize);
+                (&mut arr.0[first.num as usize][first.letter as usize], &mut arr.1[0][second.letter as usize])
+            };
+
+            swap(first, second);
+
+            // let (first_arr, second_arr) = 
+            //     self.0.split_at_mut(second.num as usize);
+
+
+        }
+
+        // swap(first_arr[first.num])
+        // swap(x, y)
+    }
+
+    pub fn get_piece(&self, position: &Position) -> &Option<Piece> {
+        &self.0[position.num as usize][position.letter as usize]
+    }
+
+    pub fn has_piece(&self, position: &Position) -> bool {
+        self.get_piece(position).is_some()
+    }
 }
 
 impl Default for Board {
@@ -142,19 +186,29 @@ impl Default for Board {
     }
 }
 
-pub struct Position<'a> {
-    letter: char,
-    num: u8,
-    piece: &'a mut Option<Piece>,
+fn alpha_to_num(alpha: char) -> u8 {
+
 }
 
-impl<'a> Position<'a> {
-    pub fn from_piece(board: &Board, piece: &'a Piece) -> Result<Self, BoardError> {
+pub struct Position {
+    letter: char,
+    num: u8,
+    // piece: &'a Option<Piece>, //TODO: remove
+}
+
+impl Position {
+    pub fn letter(&self) -> u8 {
+        (self.letter as u8) - ('a' as u8)
+    }
+}
+
+impl<'a> Position<> {
+    pub fn from_piece(board: &Board, piece: &Piece) -> Result<Self, BoardError> {
         // Err("Could not unambigously identify piece.\n use `move [position] [position]` format.")
         Err(BoardError::AmbigousMatch) // TODO
     }
 
-    pub fn from_str(board: &'a mut Board, str: &str) -> Result<Self, Box<dyn Error>> {
+    pub fn from_str(board: &'a Board, str: &str) -> Result<Self, Box<dyn Error>> {
         if str.len() == 2 {
             let str = str.split_at(1);
             let (letter, num) = (str.0.to_ascii_lowercase().parse::<char>()?, str.1.parse()?);
@@ -163,19 +217,25 @@ impl<'a> Position<'a> {
                 return Ok(Self {
                     letter,
                     num,
-                    piece: &mut board.0[letter as usize][num as usize],
+                    // piece: &board.0[letter as usize][num as usize], // TODO: use board.get()
                 });
             }
         }
         Err(Box::new(BoardError::ParseError))
     }
 
-    fn has_piece(&self) -> bool {
-        self.piece.is_some()
-    }
+    // pub fn has_piece(&self) -> bool {
+    //     self.piece.is_some()
+    // }
 
-    fn swap(&mut self, position: &mut Position) {
-        swap(self.piece, position.piece);
+    // pub fn swap(&mut self, position: &mut Position) {
+    //     swap(self.piece, position.piece);
+    // }
+}
+
+impl Display for Position {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}{}", self.letter, self.num)
     }
 }
 
