@@ -141,7 +141,7 @@ impl Board {
         Ok(())
     }
 
-    pub fn swap(&mut self, first: &Position, second: &Position) {
+    pub fn try_move(&mut self, first: &Position, second: &Position) -> Result<(), &'static str> {
         if first.num_index() == second.num_index() {
             self.0[first.num_index()].swap(first.letter_index(), second.letter_index());
         } else {
@@ -161,6 +161,8 @@ impl Board {
 
             swap(first, second);
         }
+
+        Ok(())
     }
 
     pub fn get_piece(&self, position: &Position) -> &Option<Piece> {
