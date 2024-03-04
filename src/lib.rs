@@ -64,6 +64,8 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
                             if let Err(err) = result {
                                 println!("{}", err);
                                 continue;
+                            } else if let Ok(Some(str)) = result {
+                                moved_message = str;
                             }
                         } else {
                             println!(
@@ -72,17 +74,18 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
                         }
                     }
                 }
-
-                moved_message = format!(
-                    "{} moved {} {} to {}",
-                    turn,
-                    board
-                        .get_piece(&move_position)
-                        .as_ref()
-                        .expect("we just moved a piece here, so it must have a piece"),
-                    moved_position,
-                    move_position
-                );
+                if moved_message.len() == 0 {
+                    moved_message = format!(
+                        "{} moved {} {} to {}",
+                        turn,
+                        board
+                            .get_piece(&move_position)
+                            .as_ref()
+                            .expect("we just moved a piece here, so it must have a piece"),
+                        moved_position,
+                        move_position
+                    );
+                }
             }
             "undo" => todo!(),
             "check" => todo!(),
@@ -109,6 +112,7 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
         };
         board.print(&turn)?;
         println!("{}", moved_message);
+        moved_message.clear();
     }
 
     Ok(())

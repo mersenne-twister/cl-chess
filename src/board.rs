@@ -150,14 +150,26 @@ impl Board {
         &mut self,
         piece_position: &Position,
         move_position: &Position,
-    ) -> Result<(), String> {
-        if let Some(err) = self.can_move(piece_position, move_position).1 {
-            Err(format!("Move error: {}", err))
-        } else {
-            self.move_piece(piece_position, move_position);
+    ) -> Result<Option<String>, String> {
+        let (result, str) = self.can_move(piece_position, move_position);
 
-            Ok(())
+        if !result {
+            Err(format!("Move error: {}", str.unwrap()))
+        } else {
+            if let Some(str) = str {
+                Ok(Some(str))
+            } else {
+                Ok(None)
+            }
         }
+
+        // if let Some(err) = self.can_move(piece_position, move_position).1 {
+        //     Err(format!("Move error: {}", err))
+        // } else {
+        //     self.move_piece(piece_position, move_position);
+
+        //     Ok(())
+        // }
     }
 
     fn can_move(
@@ -180,8 +192,8 @@ impl Board {
                 // if moving forward 1, check that there is no piece there
                 // if moving forward 2, check that it's the first time that pawn has moved
                 // if capturing, check that there's a capturable piece where it's moving
-                // if en pessanteing, fuck me or something I dunno what the rules are
-                
+                // if en pessanteing, do something or other I dunno the rules
+
                 todo!()
             }
             Piece::Knight(_) => {
@@ -191,19 +203,19 @@ impl Board {
             }
             Piece::Bishop(_) => {
                 // verify that movement is diagonal of it, and no pieces in the way
-                
+
                 todo!()
             }
             Piece::Rook(_) => {
                 // verify movement is on same row or same column,
                 // and there are no pieces in between
-                
+
                 todo!()
             }
             Piece::Queen(_) => {
                 // verify that movement is either diagonal or vertical/horizontal,
                 // and no pieces in way
-                
+
                 todo!()
             }
             Piece::King(_) => {
