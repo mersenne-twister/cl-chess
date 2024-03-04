@@ -8,6 +8,9 @@ move a piece
 usage:
     `move [piece-name] [position]`
     `move [position] [position]`
+    position: a letter followed by a number (example: e5)
+    piece-name: the name of a piece
+        (possible names: `pawn`, knight, bishop, rook, queen, king)
 if intended piece is unambigous, move it
 otherwise print error requiring `move [position] [position]` format
 
@@ -21,5 +24,21 @@ hint:
 get a (questionable) hint on where to move
 usage:
   `hint`
-  
-To print the board, enter without typing anything.";
+
+undo:
+    rollbacks 1 move.
+usage:
+    `undo`
+
+show:
+    show the board from the position of either color
+usage:
+    `show [color]`
+    possible colors: `white`, `black`
+
+exit:
+    immediately end the game
+usage:
+    `exit`
+
+ To print the board, enter without typing anything.";
