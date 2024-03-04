@@ -17,10 +17,18 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
     wait_for_enter(&mut input)?;
     let mut turn = PieceColor::White;
     let mut board = Board::new();
-    // board.print(&turn)?;
+    let mut moved_message = String::new();
+    board.print(&turn)?;
+
+    // TODO: add check detection
+    // TODO: add checkmate detection
+    // TODO: show points
+    // TODO: show moves
+    // TODO: add undo
+    // TODO: add total time, and time per player
+    // TODO: support for timed game (with real-time counter)
 
     loop {
-        board.print(&turn)?;
         println!("{}'s turn:", turn);
         input.clear();
         get_input(&mut input)?;
@@ -51,12 +59,12 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
                     position => {
                         if let Ok(piece_position) = Position::from_str(&board, position) {
                             moved_position = piece_position.clone();
-                            if !board.has_piece(&piece_position) {
-                                println!("Specified position must contain a piece");
+
+                            let result = board.try_move(&piece_position, &move_position);
+                            if let Err(err) = result {
+                                println!("{}", err);
                                 continue;
                             }
-                            // position.swap(&mut move_position);
-                            board.try_move(&piece_position, &move_position);
                         } else {
                             println!(
                             "Invalid arguments. Expected piece name or position.\nEnter 'help' to see help.");
@@ -65,10 +73,13 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
                     }
                 }
 
-                println!(
+                moved_message = format!(
                     "{} moved {} {} to {}",
                     turn,
-                    board.get_piece(&move_position).expect("verified to have a piece"),
+                    board
+                        .get_piece(&move_position)
+                        .as_ref()
+                        .expect("we just moved a piece here, so it must have a piece"),
                     moved_position,
                     move_position
                 );
@@ -96,6 +107,8 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
         } else {
             PieceColor::White
         };
+        board.print(&turn)?;
+        println!("{}", moved_message);
     }
 
     Ok(())
