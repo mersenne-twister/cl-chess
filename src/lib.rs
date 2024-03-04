@@ -56,7 +56,7 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
                                 continue;
                             }
                             // position.swap(&mut move_position);
-                            board.swap(&piece_position, &move_position);
+                            board.try_move(&piece_position, &move_position);
                         } else {
                             println!(
                             "Invalid arguments. Expected piece name or position.\nEnter 'help' to see help.");
