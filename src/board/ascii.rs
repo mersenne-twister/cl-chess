@@ -5,7 +5,7 @@ use {
     std::collections::HashMap,
 };
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
 pub enum Tile {
     Black(Option<Piece>),
     White(Option<Piece>),
