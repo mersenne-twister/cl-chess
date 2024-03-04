@@ -6,7 +6,7 @@ use {
 
 mod ascii;
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Board([[Option<Piece>; 8]; 8]);
 
 impl Board {
@@ -103,13 +103,19 @@ impl Board {
                     format!("{}{}{}", "  ", number, "  ")
                         .on_custom_color(ascii::BORDER_BACKGROUND.into())
                 );
-                for k in 0..8 {
+                // for k in 0..8 {
+                for k in if PieceColor::Black == *rotation {
+                    Box::new((0..8usize).rev()) as Box<dyn Iterator<Item = _>>
+                } else {
+                    Box::new(0..8usize) as Box<dyn Iterator<Item = _>>
+                } {
                     print!(
                         "{}",
                         PIECES_ASCII
                             .get(
-                                &(if (((i % 2) == 0) && ((k % 2) == 0))
-                                    || (((i % 2) != 0) && ((k % 2) != 0))
+                                // these literals don't coerce to usize for some reason
+                                &(if (((i % 2) == 0) && ((k % 2usize) == 0usize))
+                                    || (((i % 2) != 0) && ((k % 2usize) != 0usize))
                                 {
                                     Tile::White(val[k])
                                 } else {
@@ -136,16 +142,21 @@ impl Board {
     }
 
     pub fn swap(&mut self, first: &Position, second: &Position) {
-        if first.num == second.num {
-            self.0[first.num as usize].swap(first.letter() as usize, second.letter() as usize);
+        if first.num_index() == second.num_index() {
+            self.0[first.num_index()].swap(first.letter_index(), second.letter_index());
         } else {
-
-            let (first, second) = if first.num > second.num {
-                let arr = self.0.split_at_mut(first.num as usize);
-                (&mut arr.1[0][first.letter() as usize], &mut arr.0[second.num as usize][second.letter() as usize])
+            let (first, second) = if first.num_index() > second.num_index() {
+                let arr = self.0.split_at_mut(first.num_index());
+                (
+                    &mut arr.1[0][first.letter_index()],
+                    &mut arr.0[second.num_index()][second.letter_index()],
+                )
             } else {
-                let arr = self.0.split_at_mut(second.num as usize);
-                (&mut arr.0[first.num as usize][first.letter() as usize], &mut arr.1[0][second.letter() as usize])
+                let arr = self.0.split_at_mut(second.num_index());
+                (
+                    &mut arr.0[first.num_index()][first.letter_index()],
+                    &mut arr.1[0][second.letter_index()],
+                )
             };
 
             swap(first, second);
@@ -153,7 +164,7 @@ impl Board {
     }
 
     pub fn get_piece(&self, position: &Position) -> &Option<Piece> {
-        &self.0[position.num as usize][position.letter() as usize]
+        &self.0[position.num_index()][position.letter_index()]
     }
 
     pub fn has_piece(&self, position: &Position) -> bool {
@@ -167,19 +178,23 @@ impl Default for Board {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Position {
     letter: char,
     num: u8,
-    // piece: &'a Option<Piece>, //TODO: remove
 }
 
 impl Position {
-    pub fn letter(&self) -> u8 {
-        ((self.letter as u8) - b'a')
+    pub fn letter_index(&self) -> usize {
+        ((self.letter as u8) - b'a') as usize
+    }
+
+    pub fn num_index(&self) -> usize {
+        ((self.num as i8) - 8).unsigned_abs() as usize
     }
 }
 
-impl<'a> Position<> {
+impl<'a> Position {
     pub fn from_piece(board: &Board, piece: &Piece) -> Result<Self, BoardError> {
         // Err("Could not unambigously identify piece.\n use `move [position] [position]` format.")
         Err(BoardError::AmbigousMatch) // TODO
@@ -190,12 +205,9 @@ impl<'a> Position<> {
             let str = str.split_at(1);
             let (letter, num) = (str.0.to_ascii_lowercase().parse::<char>()?, str.1.parse()?);
 
-            if letter.is_ascii_alphabetic() && (letter < 'h') && (1..=8).contains(&num) {
-                return Ok(Self {
-                    letter,
-                    num,
-                    // piece: &board.0[letter as usize][num as usize], // TODO: use board.get()
-                });
+            // must be lowercase, must be alphabetic, therefore must be >= to 'a'
+            if letter.is_ascii_alphabetic() && (letter <= 'h') && (1..=8).contains(&num) {
+                return Ok(Self { letter, num });
             }
         }
         Err(Box::new(BoardError::ParseError))
@@ -245,7 +257,7 @@ impl Error for BoardError {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord, Debug)]
 pub enum Piece {
     // ordered by point amount
     Pawn(PieceColor),
@@ -270,7 +282,20 @@ impl Piece {
     }
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
+impl Display for Piece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            Piece::Pawn(_) => write!(f, "pawn"),
+            Piece::Knight(_) => write!(f, "knight"),
+            Piece::Bishop(_) => write!(f, "bishop"),
+            Piece::Rook(_) => write!(f, "rook"),
+            Piece::Queen(_) => write!(f, "queen"),
+            Piece::King(_) => write!(f, "king"),
+        }
+    }
+}
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug)]
 pub enum PieceColor {
     Black,
     White,
