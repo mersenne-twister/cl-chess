@@ -151,15 +151,96 @@ impl Board {
         piece_position: &Position,
         move_position: &Position,
     ) -> Result<(), String> {
+        if let Some(err) = self.can_move(piece_position, move_position).1 {
+            Err(format!("Move error: {}", err))
+        } else {
+            self.move_piece(piece_position, move_position);
+
+            Ok(())
+        }
+    }
+
+    fn can_move(
+        &self,
+        piece_position: &Position,
+        move_position: &Position,
+    ) -> (bool, Option<String>) {
+        if !self.has_piece(piece_position) {
+            return (false, Some(format!("No piece at {}", piece_position)));
+        }
         if piece_position == move_position {
-            return Err("Move error: A piece cannot capture itself.".to_string());
-        } else if !self.has_piece(piece_position) {
-            return Err(format!("Move error: No piece at {}", piece_position));
+            return (false, Some("A piece cannot capture itself.".to_string()));
         }
 
-        self.move_piece(piece_position, move_position);
+        match self
+            .get_piece(piece_position)
+            .expect("we've verified piece_position is at a piece")
+        {
+            Piece::Pawn(_) => {
+                // if moving forward 1, check that there is no piece there
+                // if moving forward 2, check that it's the first time that pawn has moved
+                // if capturing, check that there's a capturable piece where it's moving
+                // if en pessanteing, fuck me or something I dunno what the rules are
+                
+                todo!()
+            }
+            Piece::Knight(_) => {
+                // verify that movement is offset by 2-1
 
-        Ok(())
+                todo!()
+            }
+            Piece::Bishop(_) => {
+                // verify that movement is diagonal of it, and no pieces in the way
+                
+                todo!()
+            }
+            Piece::Rook(_) => {
+                // verify movement is on same row or same column,
+                // and there are no pieces in between
+                
+                todo!()
+            }
+            Piece::Queen(_) => {
+                // verify that movement is either diagonal or vertical/horizontal,
+                // and no pieces in way
+                
+                todo!()
+            }
+            Piece::King(_) => {
+                // verify that movement is either diagonal or horizontal,
+                // and not more than one piece
+
+                todo!()
+            }
+        }
+
+        if self.get_piece(move_position).is_some()
+            && (self.get_piece(piece_position).unwrap().color()
+                == self.get_piece(move_position).unwrap().color())
+        {
+            return (
+                false,
+                Some("A piece cannot capture a piece of its own color".to_string()),
+            );
+        }
+
+        (true, None)
+    }
+
+    fn is_diagonal(&self, piece_position: &Position, move_position: &Position) -> bool {
+        false
+    }
+
+    fn is_vertizontal(&self, piece_position: &Position, move_position: &Position) -> bool {
+        false
+    }
+
+    fn can_move_diagonally(&self, piece_position: &Position, move_position: &Position) -> bool {
+        false
+    }
+
+    fn can_move_vertizontally(&self, piece_position: &Position, move_position: &Position) -> bool {
+        false
     }
 
     /// unconditionally move a piece
@@ -287,6 +368,17 @@ impl Piece {
             "queen" => Ok(Piece::Queen(color)),
             "king" => Ok(Piece::King(color)),
             _ => Err(BoardError::ParseError),
+        }
+    }
+
+    fn color(&self) -> PieceColor {
+        match *self {
+            Piece::Pawn(color) => color,
+            Piece::Knight(color) => color,
+            Piece::Bishop(color) => color,
+            Piece::Rook(color) => color,
+            Piece::Queen(color) => color,
+            Piece::King(color) => color,
         }
     }
 }
