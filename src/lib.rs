@@ -1,7 +1,7 @@
 use {
+    crate::board::Position,
     args::Args,
     board::{Board, PieceColor},
-    colored::Colorize,
     std::{error::Error, io},
 };
 
@@ -17,9 +17,10 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
     wait_for_enter(&mut input)?;
     let mut turn = PieceColor::White;
     let mut board = Board::new();
-    board.print(&turn)?;
+    // board.print(&turn)?;
 
     loop {
+        board.print(&turn)?;
         println!("{}'s turn:", turn);
         input.clear();
         get_input(&mut input)?;
@@ -27,21 +28,52 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
         let input = input.to_ascii_lowercase(); // this keeps the string from being dropped
         let mut input = input.as_str().split_ascii_whitespace();
         match input.next().unwrap_or("") {
-            "move" => match input.next().unwrap_or("default") {
-                piece @ ("pawn" | "knight" | "bishop" | "rook" | "queen" | "king") => {
-                    todo!();
-                }
-                "default" => {
-                    println!("`move` command requires arguments. Enter `help` for details.");
-                    continue;
-                }
-                position => {
-                    todo!();
-
+            "move" => {
+                let arg = input.next().unwrap_or("default");
+                let Ok(mut move_position) =
+                    Position::from_str(&board, input.next().unwrap_or("default"))
+                else {
                     println!(
-                        "Invalid argument. Expected piece name or position.\nEnter 'help' to see Help.");
+                        "Invalid arguments. Expected move position.\nEnter 'help' to see help"
+                    );
+                    continue;
+                };
+                let moved_position;
+
+                match arg {
+                    piece @ ("pawn" | "knight" | "bishop" | "rook" | "queen" | "king") => {
+                        todo!();
+                    }
+                    "default" => {
+                        println!("`move` command requires arguments. Enter `help` for details.");
+                        continue;
+                    }
+                    position => {
+                        if let Ok(piece_position) = Position::from_str(&board, position) {
+                            moved_position = piece_position.clone();
+                            if !board.has_piece(&piece_position) {
+                                println!("Specified position must contain a piece");
+                                continue;
+                            }
+                            // position.swap(&mut move_position);
+                            board.swap(&piece_position, &move_position);
+                        } else {
+                            println!(
+                            "Invalid arguments. Expected piece name or position.\nEnter 'help' to see help.");
+                            continue;
+                        }
+                    }
                 }
-            },
+
+                println!(
+                    "{} moved {} {} to {}",
+                    turn,
+                    board.get_piece(&move_position).expect("verified to have a piece"),
+                    moved_position,
+                    move_position
+                );
+            }
+            "undo" => todo!(),
             "check" => todo!(),
             "hint" => todo!(),
             "help" => {
@@ -59,12 +91,11 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
             }
         }
 
-        turn = (if turn == PieceColor::White {
+        turn = if turn == PieceColor::White {
             PieceColor::Black
         } else {
             PieceColor::White
-        });
-        board.print(&turn);
+        };
     }
 
     Ok(())
