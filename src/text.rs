@@ -31,7 +31,7 @@ usage:
     `undo`
 
 show:
-    show the board from the position of either color
+    show the board from the position of either color.
 usage:
     `show [color]`
     possible colors: `white`, `black`
@@ -40,5 +40,18 @@ exit:
     immediately end the game
 usage:
     `exit`
+
+help:
+    print help for using the program, or for chess rules.
+usage:
+    `help`
+        print this message.
+    `help chess`
+        print all chess rules.
+    `help [piece-name]`
+        print rules for a specific piece
+    `help check`
+        print rules for check/checkmate
+    ANYTHING ELSE I CAN PRINT? EMAIL ME AT IRIS.TEYSSIER@GMAIL.COM
 
  To print the board, enter without typing anything.";
