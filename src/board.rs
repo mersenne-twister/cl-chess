@@ -143,7 +143,7 @@ impl Board {
         // self.0.swap()
 
         if first.num == second.num {
-            self.0[first.num as usize].swap(first.letter as usize, second.letter as usize);
+            self.0[first.num as usize].swap(first.letter() as usize, second.letter() as usize);
         } else {
             // let (first, second) = if first.num > second.num {
             //     // let arr = self.0.split_at_mut(second.num as usize);
@@ -153,10 +153,10 @@ impl Board {
 
             let (first, second) = if first.num > second.num {
                 let arr = self.0.split_at_mut(first.num as usize);
-                (&mut arr.1[0][first.letter as usize], &mut arr.0[second.num as usize][second.letter as usize])
+                (&mut arr.1[0][first.letter() as usize], &mut arr.0[second.num as usize][second.letter() as usize])
             } else {
                 let arr = self.0.split_at_mut(second.num as usize);
-                (&mut arr.0[first.num as usize][first.letter as usize], &mut arr.1[0][second.letter as usize])
+                (&mut arr.0[first.num as usize][first.letter() as usize], &mut arr.1[0][second.letter() as usize])
             };
 
             swap(first, second);
@@ -172,7 +172,7 @@ impl Board {
     }
 
     pub fn get_piece(&self, position: &Position) -> &Option<Piece> {
-        &self.0[position.num as usize][position.letter as usize]
+        &self.0[position.num as usize][position.letter() as usize]
     }
 
     pub fn has_piece(&self, position: &Position) -> bool {
@@ -184,10 +184,6 @@ impl Default for Board {
     fn default() -> Self {
         Self::new()
     }
-}
-
-fn alpha_to_num(alpha: char) -> u8 {
-
 }
 
 pub struct Position {
