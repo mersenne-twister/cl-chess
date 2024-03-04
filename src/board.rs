@@ -7,54 +7,54 @@ use {
 mod ascii;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
-pub struct Board([[Option<Piece>; 8]; 8]);
+pub struct Board([[Option<(Piece, bool)>; 8]; 8]); // Option<(Piece, bool)>
 
 impl Board {
     pub fn new() -> Self {
         Self([
             [
-                Some(Piece::Rook(PieceColor::Black)),
-                Some(Piece::Knight(PieceColor::Black)),
-                Some(Piece::Bishop(PieceColor::Black)),
-                Some(Piece::Queen(PieceColor::Black)),
-                Some(Piece::King(PieceColor::Black)),
-                Some(Piece::Bishop(PieceColor::Black)),
-                Some(Piece::Knight(PieceColor::Black)),
-                Some(Piece::Rook(PieceColor::Black)),
+                Some((Piece::Rook(PieceColor::Black), false)),
+                Some((Piece::Knight(PieceColor::Black), false)),
+                Some((Piece::Bishop(PieceColor::Black), false)),
+                Some((Piece::Queen(PieceColor::Black), false)),
+                Some((Piece::King(PieceColor::Black), false)),
+                Some((Piece::Bishop(PieceColor::Black), false)),
+                Some((Piece::Knight(PieceColor::Black), false)),
+                Some((Piece::Rook(PieceColor::Black), false)),
             ],
             [
-                Some(Piece::Pawn(PieceColor::Black)),
-                Some(Piece::Pawn(PieceColor::Black)),
-                Some(Piece::Pawn(PieceColor::Black)),
-                Some(Piece::Pawn(PieceColor::Black)),
-                Some(Piece::Pawn(PieceColor::Black)),
-                Some(Piece::Pawn(PieceColor::Black)),
-                Some(Piece::Pawn(PieceColor::Black)),
-                Some(Piece::Pawn(PieceColor::Black)),
+                Some((Piece::Pawn(PieceColor::Black), false)),
+                Some((Piece::Pawn(PieceColor::Black), false)),
+                Some((Piece::Pawn(PieceColor::Black), false)),
+                Some((Piece::Pawn(PieceColor::Black), false)),
+                Some((Piece::Pawn(PieceColor::Black), false)),
+                Some((Piece::Pawn(PieceColor::Black), false)),
+                Some((Piece::Pawn(PieceColor::Black), false)),
+                Some((Piece::Pawn(PieceColor::Black), false)),
             ],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [
-                Some(Piece::Pawn(PieceColor::White)),
-                Some(Piece::Pawn(PieceColor::White)),
-                Some(Piece::Pawn(PieceColor::White)),
-                Some(Piece::Pawn(PieceColor::White)),
-                Some(Piece::Pawn(PieceColor::White)),
-                Some(Piece::Pawn(PieceColor::White)),
-                Some(Piece::Pawn(PieceColor::White)),
-                Some(Piece::Pawn(PieceColor::White)),
+                Some((Piece::Pawn(PieceColor::White), false)),
+                Some((Piece::Pawn(PieceColor::White), false)),
+                Some((Piece::Pawn(PieceColor::White), false)),
+                Some((Piece::Pawn(PieceColor::White), false)),
+                Some((Piece::Pawn(PieceColor::White), false)),
+                Some((Piece::Pawn(PieceColor::White), false)),
+                Some((Piece::Pawn(PieceColor::White), false)),
+                Some((Piece::Pawn(PieceColor::White), false)),
             ],
             [
-                Some(Piece::Rook(PieceColor::White)),
-                Some(Piece::Knight(PieceColor::White)),
-                Some(Piece::Bishop(PieceColor::White)),
-                Some(Piece::Queen(PieceColor::White)),
-                Some(Piece::King(PieceColor::White)),
-                Some(Piece::Bishop(PieceColor::White)),
-                Some(Piece::Knight(PieceColor::White)),
-                Some(Piece::Rook(PieceColor::White)),
+                Some((Piece::Rook(PieceColor::White), false)),
+                Some((Piece::Knight(PieceColor::White), false)),
+                Some((Piece::Bishop(PieceColor::White), false)),
+                Some((Piece::Queen(PieceColor::White), false)),
+                Some((Piece::King(PieceColor::White), false)),
+                Some((Piece::Bishop(PieceColor::White), false)),
+                Some((Piece::Knight(PieceColor::White), false)),
+                Some((Piece::Rook(PieceColor::White), false)),
             ],
             // [None, None, None, None, None, None, None, None],
             // [None, None, None, None, None, None, None, None],
@@ -81,7 +81,7 @@ impl Board {
 
         // casting to a trait object is required because both possible values
         // must have the same type
-        let iter: Box<dyn Iterator<Item = (usize, &[Option<Piece>; 8])>>;
+        let iter: Box<dyn Iterator<Item = (usize, &[Option<(Piece, bool)>; 8])>>;
         if let PieceColor::Black = *rotation {
             iter = Box::new(self.0.iter().rev().enumerate()) as Box<dyn Iterator<Item = _>>;
         } else {
@@ -109,6 +109,8 @@ impl Board {
                 } else {
                     Box::new(0..8usize) as Box<dyn Iterator<Item = _>>
                 } {
+                    // let extract_piece = |tuple: (Piece, bool)| -> Piece {tuple.0};
+                    // .map(|tuple: (Piece, bool)| -> Piece {tuple.0} )
                     print!(
                         "{}",
                         PIECES_ASCII
@@ -156,6 +158,7 @@ impl Board {
         if !result {
             Err(format!("Move error: {}", str.unwrap()))
         } else {
+            self.move_piece(piece_position, move_position);
             if let Some(str) = str {
                 Ok(Some(str))
             } else {
@@ -187,6 +190,7 @@ impl Board {
         match self
             .get_piece(piece_position)
             .expect("we've verified piece_position is at a piece")
+            .0
         {
             Piece::Pawn(_) => {
                 // if moving forward 1, check that there is no piece there
@@ -203,32 +207,64 @@ impl Board {
             }
             Piece::Bishop(_) => {
                 // verify that movement is diagonal of it, and no pieces in the way
+                // DONE
 
-                todo!()
+                if !self.is_diagonal(piece_position, move_position) {
+                    return (false, Some("Bishop's can only move diagonally".to_string()));
+                }
+
+                if !self.can_move_diagonally(piece_position, move_position) {
+                    return (
+                        false,
+                        Some(format!(
+                            "Bishop must have a clear path to {}",
+                            move_position
+                        )),
+                    );
+                }
             }
             Piece::Rook(_) => {
                 // verify movement is on same row or same column,
                 // and there are no pieces in between
+                // if castling, say must castle with king
 
                 todo!()
             }
             Piece::Queen(_) => {
                 // verify that movement is either diagonal or vertical/horizontal,
                 // and no pieces in way
+                // DONE
 
-                todo!()
+                if !self.is_diagonal(piece_position, move_position)
+                    || !self.is_axial(piece_position, move_position)
+                {
+                    return (
+                        false,
+                        Some("Queen's can only move diagonally or up and down".to_string()),
+                    );
+                }
+
+                if !self.can_move_diagonally(piece_position, move_position)
+                    || !self.can_move_axially(piece_position, move_position)
+                {
+                    return (
+                        false,
+                        Some(format!("Queen must have a clear path to {}", move_position)),
+                    );
+                }
             }
             Piece::King(_) => {
                 // verify that movement is either diagonal or horizontal,
                 // and not more than one piece
+                // if caslting swap and don't move somehow
 
                 todo!()
             }
         }
 
         if self.get_piece(move_position).is_some()
-            && (self.get_piece(piece_position).unwrap().color()
-                == self.get_piece(move_position).unwrap().color())
+            && (self.get_piece(piece_position).unwrap().0.color()
+                == self.get_piece(move_position).unwrap().0.color())
         {
             return (
                 false,
@@ -240,19 +276,19 @@ impl Board {
     }
 
     fn is_diagonal(&self, piece_position: &Position, move_position: &Position) -> bool {
-        false
+        todo!();
     }
 
-    fn is_vertizontal(&self, piece_position: &Position, move_position: &Position) -> bool {
-        false
+    fn is_axial(&self, piece_position: &Position, move_position: &Position) -> bool {
+        todo!();
     }
 
     fn can_move_diagonally(&self, piece_position: &Position, move_position: &Position) -> bool {
-        false
+        todo!();
     }
 
-    fn can_move_vertizontally(&self, piece_position: &Position, move_position: &Position) -> bool {
-        false
+    fn can_move_axially(&self, piece_position: &Position, move_position: &Position) -> bool {
+        todo!();
     }
 
     /// unconditionally move a piece
@@ -261,16 +297,24 @@ impl Board {
         *self.get_piece_mut(piece_position) = None;
     } // TODO: return points
 
-    pub fn get_piece(&self, position: &Position) -> &Option<Piece> {
+    pub fn get_piece(&self, position: &Position) -> &Option<(Piece, bool)> {
         &self.0[position.num_index()][position.letter_index()]
     }
 
-    fn get_piece_mut(&mut self, position: &Position) -> &mut Option<Piece> {
+    fn get_piece_mut(&mut self, position: &Position) -> &mut Option<(Piece, bool)> {
         &mut self.0[position.num_index()][position.letter_index()]
     }
 
     pub fn has_piece(&self, position: &Position) -> bool {
         self.get_piece(position).is_some()
+    }
+}
+
+fn extract_piece(piece: Option<(Piece, bool)>) -> Option<Piece> {
+    if let Some(tuple) = piece {
+        Some(tuple.0)
+    } else {
+        None
     }
 }
 
@@ -359,15 +403,15 @@ impl Error for BoardError {
     }
 }
 
-#[derive(PartialEq, Eq, Hash, Clone, Copy, PartialOrd, Ord, Debug)]
+#[derive(Hash, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub enum Piece {
     // ordered by point amount
-    Pawn(PieceColor),
+    Pawn(PieceColor), // TODO: add has_moved
     Knight(PieceColor),
     Bishop(PieceColor),
-    Rook(PieceColor),
+    Rook(PieceColor), // TODO: add has_moved
     Queen(PieceColor),
-    King(PieceColor),
+    King(PieceColor), // TODO: add has_moved
 }
 
 impl Piece {
