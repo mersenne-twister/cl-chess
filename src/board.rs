@@ -194,7 +194,7 @@ pub struct Position {
 
 impl Position {
     pub fn letter(&self) -> u8 {
-        (self.letter as u8) - ('a' as u8)
+        ((self.letter as u8) - b'a') - 1
     }
 }
 
