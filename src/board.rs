@@ -136,20 +136,9 @@ impl Board {
     }
 
     pub fn swap(&mut self, first: &Position, second: &Position) {
-        // swap(self.get(first), self.get(second));
-        // self.get(first)
-
-        // self.0[first.num as usize][first.letter as usize].swap
-        // self.0.swap()
-
         if first.num == second.num {
             self.0[first.num as usize].swap(first.letter() as usize, second.letter() as usize);
         } else {
-            // let (first, second) = if first.num > second.num {
-            //     // let arr = self.0.split_at_mut(second.num as usize);
-            // } else {
-            //     // self.0.split_at_mut(first.num as usize)
-            // };
 
             let (first, second) = if first.num > second.num {
                 let arr = self.0.split_at_mut(first.num as usize);
@@ -160,15 +149,7 @@ impl Board {
             };
 
             swap(first, second);
-
-            // let (first_arr, second_arr) = 
-            //     self.0.split_at_mut(second.num as usize);
-
-
         }
-
-        // swap(first_arr[first.num])
-        // swap(x, y)
     }
 
     pub fn get_piece(&self, position: &Position) -> &Option<Piece> {
@@ -194,7 +175,7 @@ pub struct Position {
 
 impl Position {
     pub fn letter(&self) -> u8 {
-        ((self.letter as u8) - b'a') - 1
+        ((self.letter as u8) - b'a')
     }
 }
 
