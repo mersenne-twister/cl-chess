@@ -114,8 +114,12 @@ impl Board {
                         PIECES_ASCII
                             .get(
                                 // these literals don't coerce to usize for some reason
-                                &(if (((i % 2) == 0) && ((k % 2usize) == 0usize))
-                                    || (((i % 2) != 0) && ((k % 2usize) != 0usize))
+                                &(if (((((i % 2) == 0) && ((k % 2usize) == 0usize))
+                                    || (((i % 2) != 0) && ((k % 2usize) != 0usize)))
+                                    && *rotation == PieceColor::White)
+                                    || (((((i % 2) == 0) && ((k % 2usize) != 0usize))
+                                        || (((i % 2) != 0) && ((k % 2usize) == 0usize)))
+                                        && *rotation == PieceColor::Black)
                                 {
                                     Tile::White(val[k])
                                 } else {
@@ -141,32 +145,35 @@ impl Board {
         Ok(())
     }
 
-    pub fn try_move(&mut self, first: &Position, second: &Position) -> Result<(), &'static str> {
-        if first.num_index() == second.num_index() {
-            self.0[first.num_index()].swap(first.letter_index(), second.letter_index());
-        } else {
-            let (first, second) = if first.num_index() > second.num_index() {
-                let arr = self.0.split_at_mut(first.num_index());
-                (
-                    &mut arr.1[0][first.letter_index()],
-                    &mut arr.0[second.num_index()][second.letter_index()],
-                )
-            } else {
-                let arr = self.0.split_at_mut(second.num_index());
-                (
-                    &mut arr.0[first.num_index()][first.letter_index()],
-                    &mut arr.1[0][second.letter_index()],
-                )
-            };
-
-            swap(first, second);
+    /// conditionally move a piece
+    pub fn try_move(
+        &mut self,
+        piece_position: &Position,
+        move_position: &Position,
+    ) -> Result<(), String> {
+        if piece_position == move_position {
+            return Err("Move error: A piece cannot capture itself.".to_string());
+        } else if !self.has_piece(piece_position) {
+            return Err(format!("Move error: No piece at {}", piece_position));
         }
+
+        self.move_piece(piece_position, move_position);
 
         Ok(())
     }
 
+    /// unconditionally move a piece
+    fn move_piece(&mut self, piece_position: &Position, move_position: &Position) {
+        *self.get_piece_mut(move_position) = Some(self.get_piece(piece_position).unwrap());
+        *self.get_piece_mut(piece_position) = None;
+    } // TODO: return points
+
     pub fn get_piece(&self, position: &Position) -> &Option<Piece> {
         &self.0[position.num_index()][position.letter_index()]
+    }
+
+    fn get_piece_mut(&mut self, position: &Position) -> &mut Option<Piece> {
+        &mut self.0[position.num_index()][position.letter_index()]
     }
 
     pub fn has_piece(&self, position: &Position) -> bool {
@@ -180,7 +187,7 @@ impl Default for Board {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Position {
     letter: char,
     num: u8,
@@ -199,7 +206,7 @@ impl Position {
 impl<'a> Position {
     pub fn from_piece(board: &Board, piece: &Piece) -> Result<Self, BoardError> {
         // Err("Could not unambigously identify piece.\n use `move [position] [position]` format.")
-        Err(BoardError::AmbigousMatch) // TODO
+        Err(BoardError::AmbigousMatch) // TODO: implement this
     }
 
     pub fn from_str(board: &'a Board, str: &str) -> Result<Self, Box<dyn Error>> {
