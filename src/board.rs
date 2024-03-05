@@ -1,7 +1,7 @@
 use {
     ascii::{Tile, PIECES_ASCII},
     colored::Colorize,
-    std::{error::Error, fmt::Display, mem::swap},
+    std::{error::Error, fmt::Display, iter::Flatten, mem::swap, slice::{Iter, IterMut}},
 };
 
 mod ascii;
@@ -180,18 +180,19 @@ impl Board {
         piece_position: &Position,
         move_position: &Position,
     ) -> (bool, Option<String>) {
-        if !self.has_piece(piece_position) {
+        let piece = self.get_piece(piece_position);
+        let move_location = self.get_piece(move_position);
+
+        if piece.is_none() {
             return (false, Some(format!("No piece at {}", piece_position)));
         }
         if piece_position == move_position {
             return (false, Some("A piece cannot capture itself.".to_string()));
         }
 
-        match self
-            .get_piece(piece_position)
-            .expect("we've verified piece_position is at a piece")
-            .0
-        {
+        let piece = piece.expect("we've verified piece_position is at a piece");
+
+        match piece.0 {
             Piece::Pawn(_) => {
                 // if moving forward 1, check that there is no piece there
                 // if moving forward 2, check that it's the first time that pawn has moved
@@ -202,8 +203,28 @@ impl Board {
             }
             Piece::Knight(_) => {
                 // verify that movement is offset by 2-1
+                // aka it's position must be within 2 in both directions, and not be axial or diagonal
+                // DONE
 
-                todo!()
+                if self.is_axial(piece_position, move_position)
+                    || self.is_diagonal(piece_position, move_position)
+                    || ((piece_position.num_index() as isize - move_position.num_index() as isize)
+                        .abs()
+                        > 2)
+                    || ((piece_position.letter_index() as isize
+                        - move_position.letter_index() as isize)
+                        .abs()
+                        > 2)
+                {
+                    return (
+                        false,
+                        Some(
+                            "A knight may only move to one of the 8 squares closest \
+                        to it and not diagonal or up/down"
+                                .to_string(),
+                        ),
+                    );
+                }
             }
             Piece::Bishop(_) => {
                 // verify that movement is diagonal of it, and no pieces in the way
@@ -227,6 +248,12 @@ impl Board {
                 // verify movement is on same row or same column,
                 // and there are no pieces in between
                 // if castling, say must castle with king
+
+                if !self.is_axial(piece_position, move_position) {
+                    return (false, Some("Rook can only move up or down".to_string()));
+                }
+
+                // if let Some(Piece::King(piece.0.color()), _) =
 
                 todo!()
             }
@@ -262,10 +289,7 @@ impl Board {
             }
         }
 
-        if self.get_piece(move_position).is_some()
-            && (self.get_piece(piece_position).unwrap().0.color()
-                == self.get_piece(move_position).unwrap().0.color())
-        {
+        if move_location.is_some() && (piece.0.color() == move_location.unwrap().0.color()) {
             return (
                 false,
                 Some("A piece cannot capture a piece of its own color".to_string()),
@@ -276,14 +300,24 @@ impl Board {
     }
 
     fn is_diagonal(&self, piece_position: &Position, move_position: &Position) -> bool {
-        todo!();
+        let vertical_difference =
+            (piece_position.num_index() as isize - move_position.num_index() as isize).abs();
+        let horizontal_difference =
+            (piece_position.letter_index() as isize - move_position.letter_index() as isize).abs();
+
+        (vertical_difference - horizontal_difference) == 0
     }
 
     fn is_axial(&self, piece_position: &Position, move_position: &Position) -> bool {
-        todo!();
+        (piece_position.num_index() == move_position.num_index())
+            || (piece_position.letter_index() == move_position.letter_index())
     }
 
     fn can_move_diagonally(&self, piece_position: &Position, move_position: &Position) -> bool {
+        // for piece in self.iter() {
+        //     if 
+        // }
+        
         todo!();
     }
 
@@ -293,7 +327,8 @@ impl Board {
 
     /// unconditionally move a piece
     fn move_piece(&mut self, piece_position: &Position, move_position: &Position) {
-        *self.get_piece_mut(move_position) = Some(self.get_piece(piece_position).unwrap());
+        *self.get_piece_mut(move_position) =
+            Some((self.get_piece(piece_position).unwrap().0, true));
         *self.get_piece_mut(piece_position) = None;
     } // TODO: return points
 
@@ -305,8 +340,24 @@ impl Board {
         &mut self.0[position.num_index()][position.letter_index()]
     }
 
+    fn find_piece_position(&self) -> Position {
+        todo!();
+    }
+
     pub fn has_piece(&self, position: &Position) -> bool {
         self.get_piece(position).is_some()
+    }
+
+    pub fn positions(&self) -> Vec<Position> {
+         let mut positions = Vec::new();
+
+        for i in 0..8 {
+            for j in 0..8 { // TODO: flatten
+                positions.push(Position::from_indices(i, j));
+            }
+        }
+        
+        positions
     }
 }
 
@@ -338,15 +389,26 @@ impl Position {
     pub fn num_index(&self) -> usize {
         ((self.num as i8) - 8).unsigned_abs() as usize
     }
-}
 
-impl<'a> Position {
+    pub fn from_indices(vert_index: usize, horiz_index: usize) -> Self {
+        assert!((vert_index < 8) && (horiz_index < 8));
+
+        Self {
+            num: (vert_index as i8 - 8).unsigned_abs(),
+            letter: (horiz_index as u8 + b'a') as char,
+        } // TODO: VERIFY THIS WORKS
+    }
+
+    // RESUME HERE
+    // VERIFY AS ABOVE, THEN IMPLEMENT GET_ITER TO ITERATE THROUGH
+
     pub fn from_piece(board: &Board, piece: &Piece) -> Result<Self, BoardError> {
+        todo!();
         // Err("Could not unambigously identify piece.\n use `move [position] [position]` format.")
         Err(BoardError::AmbigousMatch) // TODO: implement this
     }
 
-    pub fn from_str(board: &'a Board, str: &str) -> Result<Self, Box<dyn Error>> {
+    pub fn from_str(board: &Board, str: &str) -> Result<Self, Box<dyn Error>> {
         if str.len() == 2 {
             let str = str.split_at(1);
             let (letter, num) = (str.0.to_ascii_lowercase().parse::<char>()?, str.1.parse()?);
@@ -358,14 +420,6 @@ impl<'a> Position {
         }
         Err(Box::new(BoardError::ParseError))
     }
-
-    // pub fn has_piece(&self) -> bool {
-    //     self.piece.is_some()
-    // }
-
-    // pub fn swap(&mut self, position: &mut Position) {
-    //     swap(self.piece, position.piece);
-    // }
 }
 
 impl Display for Position {
