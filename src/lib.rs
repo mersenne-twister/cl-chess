@@ -81,7 +81,8 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
                         board
                             .get_piece(&move_position)
                             .as_ref()
-                            .expect("we just moved a piece here, so it must have a piece"),
+                            .expect("we just moved a piece here, so it must have a piece")
+                            .0,
                         moved_position,
                         move_position
                     );
