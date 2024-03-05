@@ -16,6 +16,13 @@ pub mod parse;
 pub mod text;
 
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
+    Board::new().can_move_diagonally(Position::from_str("a1"), Position::from_str("d4"));
+
+    return Ok(());
+
+
+    
+
     println!("{}\n{}", text::INTRO, text::HELP);
 
     let mut input = String::new();
@@ -45,8 +52,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
         match input.next().unwrap_or("") {
             "move" => {
                 let arg = input.next().unwrap_or("default");
-                let Ok(move_position) =
-                    Position::from_str(&board, input.next().unwrap_or("default"))
+                let Ok(move_position) = Position::from_str(input.next().unwrap_or("default"))
                 else {
                     println!(
                         "Invalid arguments. Expected move position.\nEnter 'help' to see help"
@@ -64,7 +70,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
                         continue;
                     }
                     position => {
-                        if let Ok(piece_position) = Position::from_str(&board, position) {
+                        if let Ok(piece_position) = Position::from_str(position) {
                             moved_position = piece_position.clone();
 
                             let result = board.try_move(&piece_position, &move_position);

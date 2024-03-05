@@ -1,7 +1,13 @@
 use {
     ascii::{Tile, PIECES_ASCII},
     colored::Colorize,
-    std::{error::Error, fmt::Display, iter::Flatten, mem::swap, slice::{Iter, IterMut}},
+    std::{
+        error::Error,
+        fmt::Display,
+        iter::Flatten,
+        mem::swap,
+        slice::{Iter, IterMut},
+    },
 };
 
 mod ascii;
@@ -313,11 +319,23 @@ impl Board {
             || (piece_position.letter_index() == move_position.letter_index())
     }
 
-    fn can_move_diagonally(&self, piece_position: &Position, move_position: &Position) -> bool {
-        // for piece in self.iter() {
-        //     if 
-        // }
-        
+    pub fn can_move_diagonally(&self, piece_position: &Position, move_position: &Position) -> bool {
+        for position in self.positions().iter() {
+            if (piece_position.num_index()..move_position.num_index())
+                .contains(&position.num_index())
+                && (piece_position.num_index()..move_position.num_index())
+                    .contains(&position.num_index())
+                && (piece_position.num_index()..move_position.num_index())
+                    .contains(&position.num_index())
+                && (piece_position.num_index()..move_position.num_index())
+                    .contains(&position.num_index())
+                && self.is_diagonal(piece_position, position)
+                && self.is_diagonal(move_position, position)
+            {
+                println!("{}", position);
+            }
+        }
+
         todo!();
     }
 
@@ -348,15 +366,16 @@ impl Board {
         self.get_piece(position).is_some()
     }
 
-    pub fn positions(&self) -> Vec<Position> {
-         let mut positions = Vec::new();
+    fn positions(&self) -> Vec<Position> {
+        let mut positions = Vec::new();
 
         for i in 0..8 {
-            for j in 0..8 { // TODO: flatten
+            for j in 0..8 {
+                // TODO: flatten
                 positions.push(Position::from_indices(i, j));
             }
         }
-        
+
         positions
     }
 }
@@ -408,7 +427,7 @@ impl Position {
         Err(BoardError::AmbigousMatch) // TODO: implement this
     }
 
-    pub fn from_str(board: &Board, str: &str) -> Result<Self, Box<dyn Error>> {
+    pub fn from_str(str: &str) -> Result<Self, Box<dyn Error>> {
         if str.len() == 2 {
             let str = str.split_at(1);
             let (letter, num) = (str.0.to_ascii_lowercase().parse::<char>()?, str.1.parse()?);
