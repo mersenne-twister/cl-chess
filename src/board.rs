@@ -123,9 +123,9 @@ impl Board {
                                         || (((i % 2) != 0) && ((k % 2usize) == 0usize)))
                                         && *rotation == PieceColor::Black)
                                 {
-                                    Tile::White(val[k])
+                                    Tile::White(extract_piece(val[k]))
                                 } else {
-                                    Tile::Black(val[k])
+                                    Tile::Black(extract_piece(val[k]))
                                 })
                             )
                             .ok_or("Failed to retrieve data (001)")?[j]
