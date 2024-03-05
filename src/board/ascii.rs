@@ -5,7 +5,7 @@ use {
     std::collections::HashMap,
 };
 
-#[derive(PartialEq, Eq, Hash, Copy, Clone, PartialOrd, Ord)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone, PartialOrd)]
 pub enum Tile {
     Black(Option<Piece>),
     White(Option<Piece>),
@@ -118,7 +118,7 @@ fn make_hashmap() -> HashMap<Tile, [String; 5]> {
     pieces_ascii.insert(Tile::White(None), make_piece(&blank, board_white, None));
 
     pieces_ascii.insert(
-        Tile::Black(Some(Piece::Pawn(PieceColor::White))),
+        Tile::Black(Some(Piece::Pawn(PieceColor::White, ))),
         make_piece(&pawn, board_black, Some(piece_white)),
     );
     pieces_ascii.insert(
