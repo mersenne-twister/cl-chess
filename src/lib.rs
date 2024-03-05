@@ -2,7 +2,12 @@ use {
     crate::board::Position,
     args::Args,
     board::{Board, PieceColor},
-    std::{error::Error, io},
+    std::{
+        error::Error,
+        io::{self, Write},
+        thread,
+        time::Duration,
+    },
 };
 
 pub mod args;
@@ -10,7 +15,7 @@ pub mod board;
 pub mod parse;
 pub mod text;
 
-pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
+pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
     println!("{}\n{}", text::INTRO, text::HELP);
 
     let mut input = String::new();
@@ -25,20 +30,22 @@ pub fn run(_args: Args) -> Result<(), Box<dyn Error>> {
     // TODO: show points
     // TODO: show moves
     // TODO: add undo
+    // TODO: print moves to file at end of game
     // TODO: add total time, and time per player
     // TODO: support for timed game (with real-time counter)
 
     loop {
-        println!("{}'s turn:", turn);
+        print!("{}'s turn: ", turn);
+        io::stdout().flush()?; // make the turn message print before the input
         input.clear();
         get_input(&mut input)?;
 
-        let input = input.to_ascii_lowercase(); // this keeps the string from being dropped
+        let input = input.trim().to_ascii_lowercase(); // this keeps the string from being dropped
         let mut input = input.as_str().split_ascii_whitespace();
         match input.next().unwrap_or("") {
             "move" => {
                 let arg = input.next().unwrap_or("default");
-                let Ok(mut move_position) =
+                let Ok(move_position) =
                     Position::from_str(&board, input.next().unwrap_or("default"))
                 else {
                     println!(
