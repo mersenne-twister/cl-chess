@@ -16,7 +16,7 @@ pub mod parse;
 pub mod text;
 
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
-    Board::new().can_move_diagonally(Position::from_str("a1"), Position::from_str("d4"));
+    Board::new().can_move_diagonally(&Position::from_str("a1").unwrap(), &Position::from_str("d4").unwrap());
 
     return Ok(());
 
