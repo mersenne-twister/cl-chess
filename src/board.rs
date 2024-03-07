@@ -13,64 +13,68 @@ use {
 mod ascii;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
-pub struct Board{
+pub struct Board {
     pieces: [[Option<(Piece, bool)>; 8]; 8],
-    moves: Vec<Move>,}
+    moves: Vec<Move>,
+}
 
 impl Board {
     pub fn new() -> Self {
-        Self([
-            [
-                Some((Piece::Rook(PieceColor::Black), false)),
-                Some((Piece::Knight(PieceColor::Black), false)),
-                Some((Piece::Bishop(PieceColor::Black), false)),
-                Some((Piece::Queen(PieceColor::Black), false)),
-                Some((Piece::King(PieceColor::Black), false)),
-                Some((Piece::Bishop(PieceColor::Black), false)),
-                Some((Piece::Knight(PieceColor::Black), false)),
-                Some((Piece::Rook(PieceColor::Black), false)),
+        Self {
+            pieces: [
+                [
+                    Some((Piece::Rook(PieceColor::Black), false)),
+                    Some((Piece::Knight(PieceColor::Black), false)),
+                    Some((Piece::Bishop(PieceColor::Black), false)),
+                    Some((Piece::Queen(PieceColor::Black), false)),
+                    Some((Piece::King(PieceColor::Black), false)),
+                    Some((Piece::Bishop(PieceColor::Black), false)),
+                    Some((Piece::Knight(PieceColor::Black), false)),
+                    Some((Piece::Rook(PieceColor::Black), false)),
+                ],
+                [
+                    Some((Piece::Pawn(PieceColor::Black), false)),
+                    Some((Piece::Pawn(PieceColor::Black), false)),
+                    Some((Piece::Pawn(PieceColor::Black), false)),
+                    Some((Piece::Pawn(PieceColor::Black), false)),
+                    Some((Piece::Pawn(PieceColor::Black), false)),
+                    Some((Piece::Pawn(PieceColor::Black), false)),
+                    Some((Piece::Pawn(PieceColor::Black), false)),
+                    Some((Piece::Pawn(PieceColor::Black), false)),
+                ],
+                [None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None],
+                // [None, None, None, None, None, None, None, None],
+                // [None, None, None, None, None, None, None, None],
+                [
+                    Some((Piece::Pawn(PieceColor::White), false)),
+                    Some((Piece::Pawn(PieceColor::White), false)),
+                    Some((Piece::Pawn(PieceColor::White), false)),
+                    Some((Piece::Pawn(PieceColor::White), false)),
+                    Some((Piece::Pawn(PieceColor::White), false)),
+                    Some((Piece::Pawn(PieceColor::White), false)),
+                    Some((Piece::Pawn(PieceColor::White), false)),
+                    Some((Piece::Pawn(PieceColor::White), false)),
+                ],
+                [
+                    Some((Piece::Rook(PieceColor::White), false)),
+                    Some((Piece::Knight(PieceColor::White), false)),
+                    Some((Piece::Bishop(PieceColor::White), false)),
+                    Some((Piece::Queen(PieceColor::White), false)),
+                    Some((Piece::King(PieceColor::White), false)),
+                    Some((Piece::Bishop(PieceColor::White), false)),
+                    Some((Piece::Knight(PieceColor::White), false)),
+                    Some((Piece::Rook(PieceColor::White), false)),
+                ],
+                // [None, None, None, None, None, None, None, None],
+                // [None, None, None, None, None, None, None, None],
+                // [None, None, None, None, None, None, None, None],
+                // [None, None, None, None, None, None, None, None],
             ],
-            // [
-            //     Some((Piece::Pawn(PieceColor::Black), false)),
-            //     Some((Piece::Pawn(PieceColor::Black), false)),
-            //     Some((Piece::Pawn(PieceColor::Black), false)),
-            //     Some((Piece::Pawn(PieceColor::Black), false)),
-            //     Some((Piece::Pawn(PieceColor::Black), false)),
-            //     Some((Piece::Pawn(PieceColor::Black), false)),
-            //     Some((Piece::Pawn(PieceColor::Black), false)),
-            //     Some((Piece::Pawn(PieceColor::Black), false)),
-            // ],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            [None, None, None, None, None, None, None, None],
-            // [
-            //     Some((Piece::Pawn(PieceColor::White), false)),
-            //     Some((Piece::Pawn(PieceColor::White), false)),
-            //     Some((Piece::Pawn(PieceColor::White), false)),
-            //     Some((Piece::Pawn(PieceColor::White), false)),
-            //     Some((Piece::Pawn(PieceColor::White), false)),
-            //     Some((Piece::Pawn(PieceColor::White), false)),
-            //     Some((Piece::Pawn(PieceColor::White), false)),
-            //     Some((Piece::Pawn(PieceColor::White), false)),
-            // ],
-            [
-                Some((Piece::Rook(PieceColor::White), false)),
-                Some((Piece::Knight(PieceColor::White), false)),
-                Some((Piece::Bishop(PieceColor::White), false)),
-                Some((Piece::Queen(PieceColor::White), false)),
-                Some((Piece::King(PieceColor::White), false)),
-                Some((Piece::Bishop(PieceColor::White), false)),
-                Some((Piece::Knight(PieceColor::White), false)),
-                Some((Piece::Rook(PieceColor::White), false)),
-            ],
-            // [None, None, None, None, None, None, None, None],
-            // [None, None, None, None, None, None, None, None],
-            // [None, None, None, None, None, None, None, None],
-            // [None, None, None, None, None, None, None, None],
-        ])
+            moves: Vec::new(),
+        }
     }
 
     pub fn print(&self, rotation: &PieceColor) -> Result<(), Box<dyn Error>> {
@@ -163,11 +167,12 @@ impl Board {
         piece_position: &Position,
         move_position: &Position,
     ) -> Result<Option<String>, String> {
-        let (result, str) = self.can_move(piece_position, move_position);
+        let (can_move, str) = self.can_move(piece_position, move_position);
 
-        if !result {
+        if let None = can_move {
             Err(format!("Move error: {}", str.unwrap()))
         } else {
+            // TODO: PUSH MOVE ONTO MOVE STACK
             self.move_piece(piece_position, move_position);
             if let Some(str) = str {
                 Ok(Some(str))
@@ -189,16 +194,17 @@ impl Board {
         &self,
         piece_position: &Position,
         move_position: &Position,
-    ) -> (bool, Option<String>) {
+    ) -> (Option<Move>, Option<String>) {
         let piece = self.get_piece(piece_position);
         let move_location = self.get_piece(move_position);
         let mut move_message = None;
+        let mut special_move: Option<SpecialMove> = None; // TODO: REMOVE TYPE ANNOTATION
 
         if piece.is_none() {
-            return (false, Some(format!("No piece at {}", piece_position)));
+            return (None, Some(format!("No piece at {}", piece_position)));
         }
         if piece_position == move_position {
-            return (false, Some("A piece cannot capture itself.".to_string()));
+            return (None, Some("A piece cannot capture itself.".to_string()));
         }
 
         let piece = piece.expect("we've verified piece_position is at a piece");
@@ -208,9 +214,92 @@ impl Board {
                 // if moving forward 1, check that there is no piece there
                 // if moving forward 2, check that it's the first time that pawn has moved
                 // if capturing, check that there's a capturable piece where it's moving
-                // if en pessanteing, do something or other I dunno the rules
+                // if en passanteing, do something or other I dunno the rules
 
-                todo!()
+                if piece_position.num == move_position.num {
+                    return (None, Some("Pawns cannot move to the side".to_owned()));
+                } else if piece_position.num > move_position.num {
+                    return (None, Some("Pawns cannot move backwards".to_owned()));
+                }
+                // else if (move_position.num + 1) > piece_position.num {
+                //     return (None, Some("Pawns can only move forward 1 or two spaces".to_owned()));
+                // }
+
+                if piece_position.letter_index() == move_position.letter_index()
+                // pawn is directly ahead
+                {
+                    if move_position.num > (piece_position.num + 2) {
+                        return (
+                            None,
+                            Some("Pawns can only move forward 1 or two spaces".to_owned()),
+                        );
+                    } else if ((move_position.num == (piece_position.num + 1))
+                        && self
+                            .get_piece(&Position::from_data(
+                                piece_position.letter_index() as u8,
+                                piece_position.num + 1,
+                            ))
+                            .is_some())
+                        || ((move_position.num == (piece_position.num + 2))
+                            && self
+                                .get_piece(&Position::from_data(
+                                    piece_position.letter_index() as u8,
+                                    piece_position.num + 2,
+                                ))
+                                .is_some())
+                    {
+                        return (
+                            None,
+                            Some("Pawns cannot capture by moving vertically".to_owned()),
+                        );
+                    } else if (move_position.num == (piece_position.num + 2)) && !piece.1 {
+                        return (
+                            None,
+                            Some(
+                                "Only a pawn that hasn't moved yet can move forward 2 tiles"
+                                    .to_owned(),
+                            ),
+                        );
+                    } else if (move_position.num == (piece_position.num + 2))
+                        && self
+                            .get_piece(&Position::from_data(
+                                piece_position.letter_index() as u8,
+                                piece_position.num + 1,
+                            ))
+                            .is_some()
+                    {
+                        return (
+                            None,
+                            Some(format!(
+                                "Pawn must have an unobstructed path to {}",
+                                move_position
+                            )),
+                        );
+                    }
+                } else if ((piece_position.letter_index() == (move_position.letter_index() + 1))
+                    || (piece_position.letter_index() == (move_position.letter_index() - 1)))
+                    && (move_position.num == (piece_position.num + 1))
+                // pawn is either side
+                {
+                    // check if empty
+                    
+                    // check if valid en passant
+                    
+                    // if so mutate board *gasP*
+
+                    // else return
+                    todo!();
+                } else {
+                    return (
+                        None,
+                        Some(
+                            "Pawns can only move straight ahead or diagonally to either side"
+                                .to_owned(),
+                        ),
+                    );
+                }
+
+                todo!();
             }
             Piece::Knight(_) => {
                 // verify that movement is offset by 2-1
@@ -228,7 +317,7 @@ impl Board {
                         > 2)
                 {
                     return (
-                        false,
+                        None,
                         Some(
                             "A knight may only move to one of the 8 squares closest \
                         to it and not diagonal or up/down"
@@ -242,14 +331,14 @@ impl Board {
                 // DONE
 
                 if !self.is_diagonal(piece_position, move_position) {
-                    return (false, Some("Bishop can only move diagonally".to_string()));
+                    return (None, Some("Bishop can only move diagonally".to_string()));
                 }
 
                 if !self.can_move_diagonally(piece_position, move_position) {
                     return (
-                        false,
+                        None,
                         Some(format!(
-                            "Bishop must have a clear path to {}",
+                            "Bishop must have an unobstructed path to {}",
                             move_position
                         )),
                     );
@@ -263,7 +352,7 @@ impl Board {
 
                 if !self.is_axial(piece_position, move_position) {
                     return (
-                        false,
+                        None,
                         Some("Rook can only move vertically/horizontally".to_string()),
                     );
                 }
@@ -272,7 +361,7 @@ impl Board {
                 match move_location {
                     Some((Piece::King(color), _)) if *color == piece.0.color() => {
                         return (
-                            false,
+                            None,
                             Some(
                                 "Caslting is a king move, and must be done with the king"
                                     .to_string(),
@@ -284,8 +373,11 @@ impl Board {
 
                 if !self.can_move_axially(piece_position, move_position) {
                     return (
-                        false,
-                        Some(format!("Rook must have a clear path to {}", move_position)),
+                        None,
+                        Some(format!(
+                            "Rook must have an unobstructed path to {}",
+                            move_position
+                        )),
                     );
                 }
             }
@@ -298,7 +390,7 @@ impl Board {
                     && !self.is_axial(piece_position, move_position)
                 {
                     return (
-                        false,
+                        None,
                         Some(
                             "Queen's can only move diagonally or vertically/horizontally"
                                 .to_string(),
@@ -310,8 +402,11 @@ impl Board {
                     || !self.can_move_axially(piece_position, move_position)
                 {
                     return (
-                        false,
-                        Some(format!("Queen must have a clear path to {}", move_position)),
+                        None,
+                        Some(format!(
+                            "Queen must have an unobstructed path to {}",
+                            move_position
+                        )),
                     );
                 }
             }
@@ -326,12 +421,13 @@ impl Board {
 
         if move_location.is_some() && (piece.0.color() == move_location.unwrap().0.color()) {
             return (
-                false,
+                None,
                 Some("A piece cannot capture a piece of its own color".to_string()),
             );
         }
 
-        if move_location.is_some() {
+        // don't overwrite more specific messages
+        if move_location.is_some() && move_message.is_none() {
             move_message = Some(format!(
                 "{} {} at {} Captured {} at {}",
                 piece.0.color(),
@@ -342,7 +438,19 @@ impl Board {
             ));
         }
 
-        (true, move_message)
+        if let Some((Piece::King(_), _)) = move_location {
+            panic!("Check invariant was not upheld, attempted to capture King.");
+        }
+
+        let piece_move = Move {
+            moved_piece: piece.0,
+            start_position: *piece_position,
+            end_position: *move_position,
+            captured_piece: move_location.map(|tuple| tuple.0), // why does *this* work???
+            special_move,
+        };
+
+        (Some(piece_move), move_message)
     }
 
     fn is_diagonal(&self, piece_position: &Position, move_position: &Position) -> bool {
@@ -471,7 +579,28 @@ impl Default for Board {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub struct Move {
+    moved_piece: Piece,
+    start_position: Position,
+    end_position: Position,
+    captured_piece: Option<Piece>,
+    special_move: Option<SpecialMove>,
+}
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub enum SpecialMove {
+    Castle(Side),
+    EnPassant,
+}
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub enum Side {
+    Kingside,
+    Queenside,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Position {
     letter: char,
     num: u8,
@@ -494,6 +623,15 @@ impl Position {
     // fn letter_position -> u8 {
 
     // }
+
+    // from literals?
+
+    pub fn from_data(letter: u8, num: u8) -> Self {
+        Self {
+            letter: (letter + b'a') as char,
+            num,
+        }
+    }
 
     pub fn from_indices(vert_index: usize, horiz_index: usize) -> Self {
         assert!((vert_index < 8) && (horiz_index < 8));
