@@ -16,12 +16,12 @@ pub mod parse;
 pub mod text;
 
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
-    Board::new().can_move_diagonally(&Position::from_str("a1").unwrap(), &Position::from_str("d4").unwrap());
+    // Board::new().can_move_axially(
+    //     &Position::from_str("f4").unwrap(),
+    //     &Position::from_str("c4").unwrap(),
+    // );
 
-    return Ok(());
-
-
-    
+    // return Ok(());
 
     println!("{}\n{}", text::INTRO, text::HELP);
 
@@ -29,7 +29,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
     wait_for_enter(&mut input)?;
     let mut turn = PieceColor::White;
     let mut board = Board::new();
-    let mut moved_message = String::new();
+    let mut moved_message = None;
     board.print(&turn)?;
 
     // TODO: add check detection
@@ -40,6 +40,13 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
     // TODO: print moves to file at end of game
     // TODO: add total time, and time per player
     // TODO: support for timed game (with real-time counter)
+    // TODO: add redo error "this dosn't exist etc etc"
+    // TODO: make get_pieces return [Pieces; 64] if possible
+
+    // BIG GOALS:
+    // USE PROPER NOTATION FOR MOVES
+    // KEEP TRACK OF TYPES OF MOVES FOR NOTATION
+    // MOVES OBVIOUSLY
 
     loop {
         print!("{}'s turn: ", turn);
@@ -49,7 +56,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
 
         let input = input.trim().to_ascii_lowercase(); // this keeps the string from being dropped
         let mut input = input.as_str().split_ascii_whitespace();
-        match input.next().unwrap_or("") {
+        match input.next().unwrap_or("default") {
             "move" => {
                 let arg = input.next().unwrap_or("default");
                 let Ok(move_position) = Position::from_str(input.next().unwrap_or("default"))
@@ -78,7 +85,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
                                 println!("{}", err);
                                 continue;
                             } else if let Ok(Some(str)) = result {
-                                moved_message = str;
+                                moved_message = Some(str);
                             }
                         } else {
                             println!(
@@ -87,8 +94,8 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
                         }
                     }
                 }
-                if moved_message.len() == 0 {
-                    moved_message = format!(
+                if moved_message.is_none() {
+                    moved_message = Some(format!(
                         "{} moved {} {} to {}",
                         turn,
                         board
@@ -98,7 +105,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
                             .0,
                         moved_position,
                         move_position
-                    );
+                    ));
                 }
             }
             "undo" => todo!(),
@@ -112,7 +119,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
                 board.print(&turn)?;
                 continue;
             }
-            "fuck" => (), // debug command
+            "fuck" => moved_message = Some("debug".to_owned()), // debug command
             _ => {
                 println!("Enter 'help' to see Help.");
                 continue;
@@ -125,8 +132,11 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
             PieceColor::White
         };
         board.print(&turn)?;
-        println!("{}", moved_message);
-        moved_message.clear();
+        println!(
+            "{}",
+            moved_message.expect("should have been assigned by this point")
+        );
+        moved_message = None;
     }
 
     Ok(())
