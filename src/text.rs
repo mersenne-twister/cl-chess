@@ -30,6 +30,9 @@ undo:
 usage:
     `undo`
 
+redo:
+    doesn't exist! make sure when you undo you mean it!
+
 show:
     show the board from the position of either color.
 usage:
