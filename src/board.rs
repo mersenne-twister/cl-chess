@@ -222,7 +222,7 @@ impl Board {
                     return (None, Some("Pawns cannot move backwards".to_owned()));
                 }
                 // else if (move_position.num + 1) > piece_position.num {
-                //     return (None, Some("Pawns can only move forward 1 or two spaces".to_owned()));
+                //     return (None, Some("Pawns can only move forward one or two spaces".to_owned()));
                 // }
 
                 if piece_position.letter_index() == move_position.letter_index()
