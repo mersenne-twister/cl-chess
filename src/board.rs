@@ -13,7 +13,9 @@ use {
 mod ascii;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
-pub struct Board([[Option<(Piece, bool)>; 8]; 8]); // Option<(Piece, bool)>
+pub struct Board{
+    pieces: [[Option<(Piece, bool)>; 8]; 8],
+    moves: Vec<Move>,}
 
 impl Board {
     pub fn new() -> Self {
@@ -28,30 +30,32 @@ impl Board {
                 Some((Piece::Knight(PieceColor::Black), false)),
                 Some((Piece::Rook(PieceColor::Black), false)),
             ],
-            [
-                Some((Piece::Pawn(PieceColor::Black), false)),
-                Some((Piece::Pawn(PieceColor::Black), false)),
-                Some((Piece::Pawn(PieceColor::Black), false)),
-                Some((Piece::Pawn(PieceColor::Black), false)),
-                Some((Piece::Pawn(PieceColor::Black), false)),
-                Some((Piece::Pawn(PieceColor::Black), false)),
-                Some((Piece::Pawn(PieceColor::Black), false)),
-                Some((Piece::Pawn(PieceColor::Black), false)),
-            ],
+            // [
+            //     Some((Piece::Pawn(PieceColor::Black), false)),
+            //     Some((Piece::Pawn(PieceColor::Black), false)),
+            //     Some((Piece::Pawn(PieceColor::Black), false)),
+            //     Some((Piece::Pawn(PieceColor::Black), false)),
+            //     Some((Piece::Pawn(PieceColor::Black), false)),
+            //     Some((Piece::Pawn(PieceColor::Black), false)),
+            //     Some((Piece::Pawn(PieceColor::Black), false)),
+            //     Some((Piece::Pawn(PieceColor::Black), false)),
+            // ],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
-            [
-                Some((Piece::Pawn(PieceColor::White), false)),
-                Some((Piece::Pawn(PieceColor::White), false)),
-                Some((Piece::Pawn(PieceColor::White), false)),
-                Some((Piece::Pawn(PieceColor::White), false)),
-                Some((Piece::Pawn(PieceColor::White), false)),
-                Some((Piece::Pawn(PieceColor::White), false)),
-                Some((Piece::Pawn(PieceColor::White), false)),
-                Some((Piece::Pawn(PieceColor::White), false)),
-            ],
+            [None, None, None, None, None, None, None, None],
+            [None, None, None, None, None, None, None, None],
+            // [
+            //     Some((Piece::Pawn(PieceColor::White), false)),
+            //     Some((Piece::Pawn(PieceColor::White), false)),
+            //     Some((Piece::Pawn(PieceColor::White), false)),
+            //     Some((Piece::Pawn(PieceColor::White), false)),
+            //     Some((Piece::Pawn(PieceColor::White), false)),
+            //     Some((Piece::Pawn(PieceColor::White), false)),
+            //     Some((Piece::Pawn(PieceColor::White), false)),
+            //     Some((Piece::Pawn(PieceColor::White), false)),
+            // ],
             [
                 Some((Piece::Rook(PieceColor::White), false)),
                 Some((Piece::Knight(PieceColor::White), false)),
@@ -89,9 +93,9 @@ impl Board {
         // must have the same type
         let iter: Box<dyn Iterator<Item = (usize, &[Option<(Piece, bool)>; 8])>>;
         if let PieceColor::Black = *rotation {
-            iter = Box::new(self.0.iter().rev().enumerate()) as Box<dyn Iterator<Item = _>>;
+            iter = Box::new(self.pieces.iter().rev().enumerate()) as Box<dyn Iterator<Item = _>>;
         } else {
-            iter = Box::new(self.0.iter().enumerate()) as Box<dyn Iterator<Item = _>>;
+            iter = Box::new(self.pieces.iter().enumerate()) as Box<dyn Iterator<Item = _>>;
         }
         for (i, val) in iter {
             for j in 0..5 {
@@ -188,6 +192,7 @@ impl Board {
     ) -> (bool, Option<String>) {
         let piece = self.get_piece(piece_position);
         let move_location = self.get_piece(move_position);
+        let mut move_message = None;
 
         if piece.is_none() {
             return (false, Some(format!("No piece at {}", piece_position)));
@@ -237,7 +242,7 @@ impl Board {
                 // DONE
 
                 if !self.is_diagonal(piece_position, move_position) {
-                    return (false, Some("Bishop's can only move diagonally".to_string()));
+                    return (false, Some("Bishop can only move diagonally".to_string()));
                 }
 
                 if !self.can_move_diagonally(piece_position, move_position) {
@@ -254,14 +259,35 @@ impl Board {
                 // verify movement is on same row or same column,
                 // and there are no pieces in between
                 // if castling, say must castle with king
+                // DONE
 
                 if !self.is_axial(piece_position, move_position) {
-                    return (false, Some("Rook can only move up or down".to_string()));
+                    return (
+                        false,
+                        Some("Rook can only move vertically/horizontally".to_string()),
+                    );
                 }
 
-                // if let Some(Piece::King(piece.0.color()), _) =
+                // if let guards/chaining currently unstable unfortunately
+                match move_location {
+                    Some((Piece::King(color), _)) if *color == piece.0.color() => {
+                        return (
+                            false,
+                            Some(
+                                "Caslting is a king move, and must be done with the king"
+                                    .to_string(),
+                            ),
+                        )
+                    }
+                    _ => (),
+                }
 
-                todo!()
+                if !self.can_move_axially(piece_position, move_position) {
+                    return (
+                        false,
+                        Some(format!("Rook must have a clear path to {}", move_position)),
+                    );
+                }
             }
             Piece::Queen(_) => {
                 // verify that movement is either diagonal or vertical/horizontal,
@@ -269,11 +295,14 @@ impl Board {
                 // DONE
 
                 if !self.is_diagonal(piece_position, move_position)
-                    || !self.is_axial(piece_position, move_position)
+                    && !self.is_axial(piece_position, move_position)
                 {
                     return (
                         false,
-                        Some("Queen's can only move diagonally or up and down".to_string()),
+                        Some(
+                            "Queen's can only move diagonally or vertically/horizontally"
+                                .to_string(),
+                        ),
                     );
                 }
 
@@ -302,7 +331,18 @@ impl Board {
             );
         }
 
-        (true, None)
+        if move_location.is_some() {
+            move_message = Some(format!(
+                "{} {} at {} Captured {} at {}",
+                piece.0.color(),
+                piece.0,
+                piece_position,
+                move_location.unwrap().0,
+                move_position
+            ));
+        }
+
+        (true, move_message)
     }
 
     fn is_diagonal(&self, piece_position: &Position, move_position: &Position) -> bool {
@@ -319,28 +359,64 @@ impl Board {
             || (piece_position.letter_index() == move_position.letter_index())
     }
 
-    pub fn can_move_diagonally(&self, piece_position: &Position, move_position: &Position) -> bool {
+    fn can_move_diagonally(&self, piece_position: &Position, move_position: &Position) -> bool {
+        let (piece_num_ind, piece_let_ind) =
+            (piece_position.num_index(), piece_position.letter_index());
+        let (move_num_ind, move_let_ind) =
+            (move_position.num_index(), move_position.letter_index());
+
         for position in self.positions().iter() {
-            if (piece_position.num_index()..move_position.num_index())
-                .contains(&position.num_index())
-                && (piece_position.num_index()..move_position.num_index())
-                    .contains(&position.num_index())
-                && (piece_position.num_index()..move_position.num_index())
-                    .contains(&position.num_index())
-                && (piece_position.num_index()..move_position.num_index())
-                    .contains(&position.num_index())
-                && self.is_diagonal(piece_position, position)
-                && self.is_diagonal(move_position, position)
+            let (p_num_ind, p_let_ind) = (position.num_index(), position.letter_index());
+
+            if (((p_num_ind > piece_num_ind) && (p_num_ind < move_num_ind))
+                || ((p_num_ind < piece_num_ind) && (p_num_ind > move_num_ind)))
+                && (((p_let_ind > piece_let_ind) && (p_let_ind < move_let_ind))
+                    || ((p_let_ind < piece_let_ind) && (p_let_ind > move_let_ind)))
+
+            && self.is_diagonal(piece_position, position)
+            && self.is_diagonal(move_position, position)
+            // ^^^ checks that position is diagonally between the two
+
+            && self.has_piece(position)
+            // since it has a piece, must be invalid
             {
-                println!("{}", position);
+                return false;
             }
         }
 
-        todo!();
+        true
     }
 
-    fn can_move_axially(&self, piece_position: &Position, move_position: &Position) -> bool {
-        todo!();
+    pub fn can_move_axially(&self, piece_position: &Position, move_position: &Position) -> bool {
+        let (piece_num_ind, piece_let_ind) =
+            (piece_position.num_index(), piece_position.letter_index());
+        let (move_num_ind, move_let_ind) =
+            (move_position.num_index(), move_position.letter_index());
+
+        for position in self.positions().iter() {
+            let (p_num_ind, p_let_ind) = (position.num_index(), position.letter_index());
+
+            if (((p_num_ind == piece_num_ind)
+                && (p_num_ind == move_num_ind)
+                && (((p_let_ind > piece_let_ind) && (p_let_ind < move_let_ind))
+                    || ((p_let_ind < piece_let_ind) && (p_let_ind > move_let_ind))))
+                || 
+                ((p_let_ind == piece_let_ind) && (p_let_ind == move_let_ind) && 
+        (((p_num_ind > piece_num_ind) && (p_num_ind < move_num_ind))
+        || ((p_num_ind < piece_num_ind) && (p_num_ind > move_num_ind)))))
+
+        && self.is_axial(piece_position, position)
+        && self.is_axial(move_position, position)
+        // ^^^ checks that piece is axially between the two
+
+        && self.has_piece(position)
+            // since it has a piece, must be invalid
+            {
+                return false;
+            }
+        }
+
+        true
     }
 
     /// unconditionally move a piece
@@ -351,11 +427,11 @@ impl Board {
     } // TODO: return points
 
     pub fn get_piece(&self, position: &Position) -> &Option<(Piece, bool)> {
-        &self.0[position.num_index()][position.letter_index()]
+        &self.pieces[position.num_index()][position.letter_index()]
     }
 
     fn get_piece_mut(&mut self, position: &Position) -> &mut Option<(Piece, bool)> {
-        &mut self.0[position.num_index()][position.letter_index()]
+        &mut self.pieces[position.num_index()][position.letter_index()]
     }
 
     fn find_piece_position(&self) -> Position {
@@ -363,6 +439,7 @@ impl Board {
     }
 
     pub fn has_piece(&self, position: &Position) -> bool {
+        // dbg!(self.get_piece(position));
         self.get_piece(position).is_some()
     }
 
@@ -401,13 +478,22 @@ pub struct Position {
 }
 
 impl Position {
-    pub fn letter_index(&self) -> usize {
+    fn letter_index(&self) -> usize {
         ((self.letter as u8) - b'a') as usize
     }
 
-    pub fn num_index(&self) -> usize {
+    fn num_index(&self) -> usize {
         ((self.num as i8) - 8).unsigned_abs() as usize
     }
+
+    // // // // // // returns the number that corresponds to where the NO IDEA
+    fn num_position(&self) -> u8 {
+        self.num - 1
+    }
+
+    // fn letter_position -> u8 {
+
+    // }
 
     pub fn from_indices(vert_index: usize, horiz_index: usize) -> Self {
         assert!((vert_index < 8) && (horiz_index < 8));
