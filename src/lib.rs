@@ -47,6 +47,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
     // USE PROPER NOTATION FOR MOVES
     // KEEP TRACK OF TYPES OF MOVES FOR NOTATION
     // MOVES OBVIOUSLY
+    // PRINT FULL MESSAGE WHEN REPRINTING BOARD
 
     loop {
         print!("{}'s turn: ", turn);
@@ -56,9 +57,27 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
 
         let input = input.trim().to_ascii_lowercase(); // this keeps the string from being dropped
         let mut input = input.as_str().split_ascii_whitespace();
-        match input.next().unwrap_or("default") {
-            "move" => {
-                let arg = input.next().unwrap_or("default");
+        match input.next().unwrap_or("") {
+            "undo" => todo!(),
+            "check" => todo!(),
+            "hint" => todo!(),
+            "help" => {
+                println!("{}", text::HELP);
+                continue;
+            }
+            "" => {
+                // board.print(&turn)?;
+                continue;
+            }
+            "fuck" => moved_message = Some("debug".to_owned()), // debug command
+            // _ => {
+            //     println!("Enter 'help' to see Help.");
+            //     continue;
+            // }
+            piece_move => {
+
+                // let arg = input.next().unwrap_or("default");
+                let arg = piece_move;
                 let Ok(move_position) = Position::from_str(input.next().unwrap_or("default"))
                 else {
                     println!(
@@ -107,22 +126,6 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
                         move_position
                     ));
                 }
-            }
-            "undo" => todo!(),
-            "check" => todo!(),
-            "hint" => todo!(),
-            "help" => {
-                println!("{}", text::HELP);
-                continue;
-            }
-            "" => {
-                board.print(&turn)?;
-                continue;
-            }
-            "fuck" => moved_message = Some("debug".to_owned()), // debug command
-            _ => {
-                println!("Enter 'help' to see Help.");
-                continue;
             }
         }
 
