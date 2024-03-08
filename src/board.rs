@@ -43,7 +43,7 @@ impl Board {
                     Some((Piece::Pawn(PieceColor::Black), false)),
                 ],
                 [None, None, None, None, None, None, None, None],
-                [None, Some((Piece::Pawn(PieceColor::White), false)), None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 // [None, None, None, None, None, None, None, None],
@@ -58,14 +58,24 @@ impl Board {
                     Some((Piece::Pawn(PieceColor::White), false)),
                     Some((Piece::Pawn(PieceColor::White), false)),
                 ],
+                // [
+                //     Some((Piece::Rook(PieceColor::White), false)),
+                //     Some((Piece::Knight(PieceColor::White), false)),
+                //     Some((Piece::Bishop(PieceColor::White), false)),
+                //     Some((Piece::Queen(PieceColor::White), false)),
+                //     Some((Piece::King(PieceColor::White), false)),
+                //     Some((Piece::Bishop(PieceColor::White), false)),
+                //     Some((Piece::Knight(PieceColor::White), false)),
+                //     Some((Piece::Rook(PieceColor::White), false)),
+                // ],
                 [
                     Some((Piece::Rook(PieceColor::White), false)),
-                    Some((Piece::Knight(PieceColor::White), false)),
-                    Some((Piece::Bishop(PieceColor::White), false)),
-                    Some((Piece::Queen(PieceColor::White), false)),
+                    None,
+                    None,
+                    None,
                     Some((Piece::King(PieceColor::White), false)),
-                    Some((Piece::Bishop(PieceColor::White), false)),
-                    Some((Piece::Knight(PieceColor::White), false)),
+                    None,
+                    None,
                     Some((Piece::Rook(PieceColor::White), false)),
                 ],
                 // [None, None, None, None, None, None, None, None],
@@ -167,18 +177,47 @@ impl Board {
         piece_position: &Position,
         move_position: &Position,
     ) -> Result<Option<String>, String> {
-        let (can_move, str) = self.can_move(piece_position, move_position);
+        let (can_move, mut str) = self.can_move(piece_position, move_position);
 
         if let None = can_move {
             Err(format!("Move error: {}", str.unwrap()))
         } else {
-            // TODO: PUSH MOVE ONTO MOVE STACK
-            self.move_piece(piece_position, move_position);
+            let piece_move = can_move.unwrap();
+            self.moves.push(piece_move.clone());
+            match piece_move.special_move {
+                None => {
+                    self.move_piece(piece_position, move_position);
+                },
+                Some(SpecialMove::EnPassant(captured_piece)) => {
+                    *self.get_piece_mut(&captured_piece) = None;
+                    self.move_piece(piece_position, move_position);
+                },
+                Some(SpecialMove::Castle(side)) => {
+                    str = Some(format!("{} king at {} castled {} to {}", self.get_piece(piece_position).unwrap().0.color(), piece_position, side, move_position));
+
+                    let king = *self.get_piece(piece_position);
+                    let rook = *self.get_piece(move_position);
+
+                    *self.get_piece_mut(piece_position) = None;
+                    *self.get_piece_mut(move_position) = None;
+
+                    *self.get_piece_mut(&Position::from_data(((piece_position.letter_index() as i8) + (if side == Side::Kingside {2} else {-2})) as u8, piece_position.num)) = king;
+                    *self.get_piece_mut(&Position::from_data(((piece_position.letter_index() as i8) + (if side == Side::Kingside {1} else {-1})) as u8, piece_position.num)) = rook;
+                },
+                Some(SpecialMove::PawnPromotion) => {
+                    // set move message
+                    todo!();
+                }
+            }
+
+
             if let Some(str) = str {
                 Ok(Some(str))
             } else {
                 Ok(None)
             }
+            // TODO: PUSH MOVE ONTO MOVE STACK
+            
         }
 
         // if let Some(err) = self.can_move(piece_position, move_position).1 {
@@ -215,6 +254,7 @@ impl Board {
                 // if moving forward 2, check that it's the first time that pawn has moved
                 // if capturing, check that there's a capturable piece where it's moving
                 // if en passanteing, do something or other I dunno the rules
+                // DONE i think
 
                 if piece_position.num == move_position.num {
                     return (None, Some("Pawns cannot move to the side".to_owned()));
@@ -293,7 +333,11 @@ impl Board {
                             let piece_move = self.moves.last().expect("can't reach this on the first turn");
                             if (piece_move.end_position != passant_pos) ||
                                     piece_move.moved_piece.1 {
-                                        return (None, Some("Can only capture a pawn by en passant that pawn that just moved".to_owned()));
+                                        return (None, Some("Can only capture a pawn by en passant that that just moved".to_owned()));
+                            } else {
+                                special_move = Some(SpecialMove::EnPassant(passant_pos));
+                                move_message = Some(format!("{} Pawn at {} captured a Pawn at {} via en passant and is now at {}", piece.0.color(), piece_position, passant_pos, move_position));
+                                // return (Some(SpecialMove::EnPassant(passant_pos)), Some(format!("{} Pawn at {} captured a Pawn at {} via en passant and is now at {}", piece.0.color(), piece_position, passant_pos, move_position)));
                             }
                         } else {
                             return (None, Some("Pawns can only move diagonally with a capture or en passant.\n\
@@ -310,6 +354,12 @@ impl Board {
                                 .to_owned(),
                         ),
                     );
+                }
+
+                // pawn promotion
+                if (move_position.num == 8) || (move_position.num == 1) {
+                    special_move = Some(SpecialMove::PawnPromotion);
+                    // message gets set by try_move()
                 }
 
                 // todo!();
@@ -428,11 +478,42 @@ impl Board {
                 // and not more than one piece
                 // if caslting swap and don't move somehow
 
-                todo!()
+                // detect if castling
+                if Some(Piece::Rook(piece.0.color())) == move_location.map(|t| t.0) {
+                    // attempting to castle
+
+                    if piece.1 || move_location.unwrap().1 {
+                        return (None, Some("Can only castle with unmoved king and rook".to_owned()));
+                    } else if !self.can_move_axially(piece_position, move_position) {
+                        return (None, Some("Can't castle with any pieces between king and rook".to_owned()));
+                    } else {
+                        // valid castle
+                        let side = if move_position.letter_index() > piece_position.letter_index() {
+                            Side::Kingside
+                        } else {
+                            Side::Queenside
+                        };
+
+                        special_move = Some(SpecialMove::Castle(side));
+                        // move message gets set by try_move
+                        // move_message = Some(format!("{} King at {} castled {}", piece.0.color(), piece_position, side));
+                    }
+                    
+                    // todo!();
+                } else if 
+                ((piece_position.num as i8 - move_position.num as i8).abs() > 1)
+                ||
+                ((piece_position.letter_index() as i8 - move_position.letter_index() as i8).abs() > 1) {
+                    // invalid king movement
+                    return (None, Some("King can only move one space at a time".to_owned()));
+                }
+
+
+                // todo!();
             }
         }
 
-        if move_location.is_some() && (piece.0.color() == move_location.unwrap().0.color()) {
+        if (move_location.is_some() && (piece.0.color() == move_location.unwrap().0.color())) && special_move.is_none() {
             return (
                 None,
                 Some("A piece cannot capture a piece of its own color".to_string()),
@@ -592,7 +673,7 @@ impl Default for Board {
     }
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
 pub struct Move {
     pub moved_piece: (Piece, bool),
     pub start_position: Position,
@@ -601,16 +682,26 @@ pub struct Move {
     pub special_move: Option<SpecialMove>,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
 pub enum SpecialMove {
     Castle(Side),
-    EnPassant,
+    EnPassant(Position),
+    PawnPromotion,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone)]
 pub enum Side {
     Kingside,
     Queenside,
+}
+
+impl Display for Side {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match *self {
+            Side::Kingside => write!(f, "kingside"),
+            Side::Queenside => write!(f, "queenside"),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
