@@ -153,6 +153,7 @@ fn get_input(buf: &mut String) -> Result<(), Box<dyn Error>> {
     //     println!("Unexpected input error: {}", err);
     //     process::exit(1);
     // });
+    buf.clear();
     io::stdin().read_line(buf)?;
     Ok(())
 }
