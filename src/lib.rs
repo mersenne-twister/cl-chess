@@ -69,7 +69,7 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
                 // board.print(&turn)?;
                 continue;
             }
-            "fuck" => moved_message = Some("debug".to_owned()), // debug command
+            "debug" => moved_message = Some("debug".to_owned()), // debug command
             // _ => {
             //     println!("Enter 'help' to see Help.");
             //     continue;
