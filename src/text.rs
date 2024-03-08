@@ -3,11 +3,10 @@ Welcome to cl-chess, made by Iris Teyssier!
 iris.teyssier@gmail.com";
 
 pub const HELP: &str = "\
-move:
-move a piece
-usage:
-    `move [piece-name] [position]`
-    `move [position] [position]`
+moving:
+    move a piece. doesn't require any command name.
+    `[piece-name] [position]`
+    `[position] [position]`
     position: a letter followed by a number (example: e5)
     piece-name: the name of a piece
         (possible names: `pawn`, knight, bishop, rook, queen, king)
@@ -60,7 +59,7 @@ usage:
     `help castling`
         print rules for castling
     `help time`
-        see information regarding timed games (\"speed chess\")
+        print information regarding timed games (\"speed chess\")
     ANYTHING ELSE I CAN PRINT? EMAIL ME AT IRIS.TEYSSIER@GMAIL.COM
 
- To print the board, enter without typing anything.";
+To print the board, enter without typing anything.";
