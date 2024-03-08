@@ -206,7 +206,38 @@ impl Board {
                 },
                 Some(SpecialMove::PawnPromotion) => {
                     // set move message
-                    todo!();
+                    
+                    println!("You've promoted a pawn!\nEnter any piece other a than pawn or king to choose it.");
+                    
+                    // TODO: extract this to a function
+                    let mut input = String::new();
+                    let chosen_piece;
+                    loop {
+                        super::get_input(&mut input);
+                        if let Ok(piece) = Piece::from_str(&input.trim().to_ascii_lowercase(), self.get_piece(piece_position).unwrap().0.color()) {
+                            match piece {
+                                Piece::King(_) | Piece::Pawn(_) => 
+                                    println!("Cannot promote to {}", piece),
+                                
+                                _ => {
+                                    chosen_piece = piece;
+                                    break;
+                                }
+                            }
+
+                        } else {
+                            println!("Could not parse string. please enter a valid piece name.");
+                        }
+                    }
+
+                    str = Some(format!("{} Pawn at {} Promoted to a {} at {}", self.get_piece(piece_position).unwrap().0.color(), piece_position, chosen_piece, move_position));
+
+                    if self.get_piece(move_position).is_some() {
+                        str = Some(format!("{} and captured a {}", str.unwrap(), self.get_piece(move_position).unwrap().0))
+                    }
+
+                    *self.get_piece_mut(piece_position) = None;
+                    *self.get_piece_mut(move_position) = Some((chosen_piece, true));
                 }
             }
 
