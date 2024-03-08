@@ -43,7 +43,7 @@ impl Board {
                     Some((Piece::Pawn(PieceColor::Black), false)),
                 ],
                 [None, None, None, None, None, None, None, None],
-                [None, None, None, None, None, None, None, None],
+                [None, Some((Piece::Pawn(PieceColor::White), false)), None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 // [None, None, None, None, None, None, None, None],
@@ -218,7 +218,9 @@ impl Board {
 
                 if piece_position.num == move_position.num {
                     return (None, Some("Pawns cannot move to the side".to_owned()));
-                } else if piece_position.num > move_position.num {
+                } else if ((piece_position.num > move_position.num) && (piece.0.color() == PieceColor::White))
+                ||
+                ((piece_position.num < move_position.num) && (piece.0.color() == PieceColor::Black)) {
                     return (None, Some("Pawns cannot move backwards".to_owned()));
                 }
                 // else if (move_position.num + 1) > piece_position.num {
@@ -231,7 +233,7 @@ impl Board {
                     if move_position.num > (piece_position.num + 2) {
                         return (
                             None,
-                            Some("Pawns can only move forward 1 or two spaces".to_owned()),
+                            Some("Pawns can only move forward one or two spaces".to_owned()),
                         );
                     } else if ((move_position.num == (piece_position.num + 1))
                         && self
@@ -252,7 +254,7 @@ impl Board {
                             None,
                             Some("Pawns cannot capture by moving vertically".to_owned()),
                         );
-                    } else if (move_position.num == (piece_position.num + 2)) && !piece.1 {
+                    } else if (move_position.num == (piece_position.num + 2)) && piece.1 {
                         return (
                             None,
                             Some(
@@ -283,8 +285,23 @@ impl Board {
                 {
                     // if invalid en passant, return
                     // if valid en passant, return
-                    // if capture, do nothing
-                    todo!();
+                    // if normal capture, do nothing
+
+                    if move_location.is_none() {
+                        let passant_pos = Position::from_literals(move_position.letter, if piece.0.color() == PieceColor::White {5} else {4});
+                        if let Some((Piece::Pawn(_), _)) = self.get_piece(&passant_pos) {
+                            let piece_move = self.moves.last().expect("can't reach this on the first turn");
+                            if (piece_move.end_position != passant_pos) ||
+                                    piece_move.moved_piece.1 {
+                                        return (None, Some("Can only capture a pawn by en passant that pawn that just moved".to_owned()));
+                            }
+                        } else {
+                            return (None, Some("Pawns can only move diagonally with a capture or en passant.\n\
+                                See en passant rules with `help en-passant`".to_owned()));
+                        }
+                    }
+
+                    // todo!();
                 } else {
                     return (
                         None,
@@ -295,7 +312,7 @@ impl Board {
                     );
                 }
 
-                todo!();
+                // todo!();
             }
             Piece::Knight(_) => {
                 // verify that movement is offset by 2-1
@@ -434,12 +451,8 @@ impl Board {
             ));
         }
 
-        if let Some((Piece::King(_), _)) = move_location {
-            panic!("Check invariant was not upheld, attempted to capture King.");
-        }
-
         let piece_move = Move {
-            moved_piece: piece.0,
+            moved_piece: piece,
             start_position: *piece_position,
             end_position: *move_position,
             captured_piece: move_location.map(|tuple| tuple.0), // why does *this* work???
@@ -525,6 +538,10 @@ impl Board {
 
     /// unconditionally move a piece
     fn move_piece(&mut self, piece_position: &Position, move_position: &Position) {
+        if let Some((Piece::King(_), _)) = self.get_piece(move_position) {
+            panic!("Check invariant was not upheld, attempted to capture King.");
+        }
+        
         *self.get_piece_mut(move_position) =
             Some((self.get_piece(piece_position).unwrap().0, true));
         *self.get_piece_mut(piece_position) = None;
@@ -577,11 +594,11 @@ impl Default for Board {
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Move {
-    moved_piece: Piece,
-    start_position: Position,
-    end_position: Position,
-    captured_piece: Option<Piece>,
-    special_move: Option<SpecialMove>,
+    pub moved_piece: (Piece, bool),
+    pub start_position: Position,
+    pub end_position: Position,
+    pub captured_piece: Option<Piece>,
+    pub special_move: Option<SpecialMove>,
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
@@ -611,17 +628,20 @@ impl Position {
         ((self.num as i8) - 8).unsigned_abs() as usize
     }
 
-    // // // // // // returns the number that corresponds to where the NO IDEA
+    /// returns the number that corresponds to where the NO IDEA
     fn num_position(&self) -> u8 {
         self.num - 1
     }
 
-    // fn letter_position -> u8 {
+    /// num must correspond to board's numbering
+    pub fn from_literals(letter: char, num: u8) -> Self {
+        Self {
+        letter,
+        num
+        }
+    }
 
-    // }
-
-    // from literals?
-
+    /// num must correspond to board's numbering
     pub fn from_data(letter: u8, num: u8) -> Self {
         Self {
             letter: (letter + b'a') as char,
@@ -637,9 +657,6 @@ impl Position {
             letter: (horiz_index as u8 + b'a') as char,
         } // TODO: VERIFY THIS WORKS
     }
-
-    // RESUME HERE
-    // VERIFY AS ABOVE, THEN IMPLEMENT GET_ITER TO ITERATE THROUGH
 
     pub fn from_piece(board: &Board, piece: &Piece) -> Result<Self, BoardError> {
         todo!();
