@@ -281,13 +281,9 @@ impl Board {
                     && (move_position.num == (piece_position.num + 1))
                 // pawn is either side
                 {
-                    // check if empty
-                    
-                    // check if valid en passant
-                    
-                    // if so mutate board *gasP*
-
-                    // else return
+                    // if invalid en passant, return
+                    // if valid en passant, return
+                    // if capture, do nothing
                     todo!();
                 } else {
                     return (
