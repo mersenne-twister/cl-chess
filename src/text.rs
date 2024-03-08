@@ -54,7 +54,13 @@ usage:
     `help [piece-name]`
         print rules for a specific piece
     `help check`
-        print rules for check/checkmate
+        print rules for check & checkmate
+    `help en-passant`
+        print rules for en passant
+    `help castling`
+        print rules for castling
+    `help time`
+        see information regarding timed games (\"speed chess\")
     ANYTHING ELSE I CAN PRINT? EMAIL ME AT IRIS.TEYSSIER@GMAIL.COM
 
  To print the board, enter without typing anything.";
