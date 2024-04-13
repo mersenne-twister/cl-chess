@@ -1,4 +1,4 @@
 # cl-chess
 Command line chess, with artificial intelligence
 
-Copyright (c) Iris Teyssier, 2024
+Licensed under MIT or Apache-2.0 at your option.
