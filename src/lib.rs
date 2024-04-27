@@ -12,10 +12,16 @@ use {
 
 pub mod args;
 pub mod board;
+mod cli;
 pub mod parse;
 pub mod text;
+pub mod tui;
 
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
+    tui::run_tui(args)
+}
+
+pub fn run_cli(args: Args) -> Result<(), Box<dyn Error>> {
     // Board::new().can_move_axially(
     //     &Position::from_str("f4").unwrap(),
     //     &Position::from_str("c4").unwrap(),
@@ -75,7 +81,6 @@ pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
             //     continue;
             // }
             piece_move => {
-
                 // let arg = input.next().unwrap_or("default");
                 let arg = piece_move;
                 let Ok(move_position) = Position::from_str(input.next().unwrap_or("default"))
