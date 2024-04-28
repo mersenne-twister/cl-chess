@@ -17,6 +17,8 @@ pub mod parse;
 pub mod text;
 pub mod tui;
 
+pub type TResult<T> = Result<T, Box<dyn Error>>;
+
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
     tui::run_tui(args)
 }
