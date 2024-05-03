@@ -70,7 +70,9 @@ trait Screen {
             if Instant::now() >= last + Duration::from_secs(1 / 60) {
                 last = Instant::now();
 
-                // self.terminal().draw(|frame| self.render_frame(frame))?;
+                // let terminal = self.terminal();
+                // terminal.draw(|frame| self.render_frame(frame))?;
+                self.terminal().draw(|frame| self.render_frame(frame))?;
             }
 
             if event::poll(Duration::from_secs(1 / 60))? {
@@ -93,7 +95,7 @@ trait Screen {
 
     /// function to handle rendering
     /// reccomended to use only for layout, and use getter functions for the widgets
-    fn render_frame(&mut self, frame: &mut Frame);
+    fn render_frame(&self, frame: &mut Frame);
 
     /// handles all the key input
     fn handle_key(&mut self, key: KeyEvent) -> TResult<()>;
@@ -118,6 +120,9 @@ trait Screen {
     // one behavior, make them proper widgets if I want to
     // be able to customize their functionaliby?
     // or just take arguments?
+
+    // for settings, there's a preview that shows your current layout
+    // allow defining arbitrary layouts
 
     // arg_widget takes size so I can have a dynamic size? using something
     // to convert the art on the fly?
