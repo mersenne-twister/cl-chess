@@ -19,6 +19,7 @@ use {
         error::Error,
         io::{self, stdout, Stdout},
         panic,
+        rc::Rc,
         time::{Duration, Instant},
     },
 };
@@ -44,7 +45,7 @@ pub fn run_tui(args: Args) -> TResult<()> {
 
     let mut terminal = RatatuiTerminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
-    let result = Menu::new(RefCell::new(terminal)).run();
+    let result = Menu::new(Rc::new(RefCell::new(terminal))).run();
 
     terminal_normal_mode()?;
 
@@ -72,7 +73,9 @@ trait Screen {
 
                 // let terminal = self.terminal();
                 // terminal.draw(|frame| self.render_frame(frame))?;
-                self.terminal().draw(|frame| self.render_frame(frame))?;
+                Rc::clone(self.terminal())
+                    .borrow_mut()
+                    .draw(|frame| self.render_frame(frame))?;
             }
 
             if event::poll(Duration::from_secs(1 / 60))? {
@@ -95,7 +98,7 @@ trait Screen {
 
     /// function to handle rendering
     /// reccomended to use only for layout, and use getter functions for the widgets
-    fn render_frame(&self, frame: &mut Frame);
+    fn render_frame(&mut self, frame: &mut Frame);
 
     /// handles all the key input
     fn handle_key(&mut self, key: KeyEvent) -> TResult<()>;
@@ -108,7 +111,9 @@ trait Screen {
     fn handle_misc(&mut self, event: Event) -> TResult<()>;
 
     ///getter for the terminal field
-    fn terminal(&self) -> RefMut<Terminal>;
+    /// `Rc<RefCell<T>>` is necessary to be able to call draw on the terminal,
+    /// while still mutating self in that method
+    fn terminal(&self) -> &Rc<RefCell<Terminal>>;
 
     /// getter determining when to exit
     fn exit(&self) -> bool;

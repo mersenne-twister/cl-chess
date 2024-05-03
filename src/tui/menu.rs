@@ -25,6 +25,7 @@ use {
         error::Error,
         io::{self, stdout, Stdout},
         ops::RangeBounds,
+        rc::Rc,
         time::{Duration, Instant},
     },
     strum::{EnumCount, IntoEnumIterator},
@@ -38,32 +39,31 @@ pub struct Menu {
     current: usize,
     exit: bool,
     // this is a gross solution, but for now it'll stay
-    items_pos: RefCell<Position>,
+    items_pos: Position,
     mouse_pos: Position,
-    terminal: RefCell<Terminal>,
+    terminal: Rc<RefCell<Terminal>>,
 }
 
 impl Menu {
-    pub fn new(terminal: RefCell<Terminal>) -> Self {
+    pub fn new(terminal: Rc<RefCell<Terminal>>) -> Self {
         Self {
             terminal,
             current: 0,
             exit: false,
-            items_pos: RefCell::new(Position::default()),
+            items_pos: Position::default(),
             mouse_pos: Position::default(),
         }
     }
 
     fn mouse_over_item(&self) -> Option<Item> {
-        match self.mouse_pos.y as i32 - self.items_pos.borrow().y as i32 - 2 {
+        match self.mouse_pos.y as i32 - self.items_pos.y as i32 - 2 {
             // 2 = space before items
             y if (0..Item::COUNT).contains(&(y as usize)) => {
                 let item = Item::from_repr(y as usize).expect("see line above");
 
                 let len = item.to_string().len() as i32;
                 let dis = (60 - len) / 2;
-                if (dis..(dis + len))
-                    .contains(&(self.mouse_pos.x as i32 - self.items_pos.borrow().x as i32))
+                if (dis..(dis + len)).contains(&(self.mouse_pos.x as i32 - self.items_pos.x as i32))
                 {
                     Some(item)
                 } else {
@@ -121,7 +121,7 @@ impl Menu {
 }
 
 impl Screen for Menu {
-    fn render_frame(&self, frame: &mut Frame) {
+    fn render_frame(&mut self, frame: &mut Frame) {
         let layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
@@ -151,7 +151,7 @@ impl Screen for Menu {
             ])
             .split(layout[3]);
 
-        *self.items_pos.borrow_mut() = items_layout[1].as_position();
+        self.items_pos = items_layout[1].as_position();
 
         frame.render_widget(art_widget(), canvas_layout[1]);
         frame.render_widget(self.items_widget(), items_layout[1]);
@@ -200,11 +200,13 @@ impl Screen for Menu {
     }
 
     fn handle_misc(&mut self, event: Event) -> TResult<()> {
-        todo!()
+        // nothing to do here (for now)
+
+        Ok(())
     }
 
-    fn terminal(&self) -> RefMut<Terminal> {
-        self.terminal.borrow_mut()
+    fn terminal(&self) -> &Rc<RefCell<Terminal>> {
+        &self.terminal
     }
 
     fn exit(&self) -> bool {
