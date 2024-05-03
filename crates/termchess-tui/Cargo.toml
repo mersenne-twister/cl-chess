@@ -1,0 +1,9 @@
+[package]
+name = "termchess-tui"
+version = "0.1.0"
+edition = "2021"
+description = "Crate to hold the tui application for termchess"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
