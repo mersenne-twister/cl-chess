@@ -1,5 +1,5 @@
 [package]
-name = "cl-chess"
+name = "termchess"
 version = "0.1.0"
 authors = ["Iris Teyssier"]
 edition = "2021"
@@ -11,6 +11,8 @@ license = "MIT OR Apache-2.0"
 [dependencies]
 clap = { version = "4.5.1", features = ["derive"] }
 colored = "2.1.0"
-crossterm = "0.27.0"
+crossterm = { version = "0.27.0", features = ["event-stream"] }
 lazy_static = "1.4.0"
 ratatui = { version = "0.26.2" }
+strum = { version = "0.26.2", features = ["strum_macros", "derive"] }
+strum_macros = "0.26.2"
