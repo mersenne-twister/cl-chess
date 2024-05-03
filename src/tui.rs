@@ -15,6 +15,7 @@ use {
         widgets::Paragraph,
     },
     std::{
+        cell::{RefCell, RefMut},
         error::Error,
         io::{self, stdout, Stdout},
         panic,
@@ -43,7 +44,7 @@ pub fn run_tui(args: Args) -> TResult<()> {
 
     let mut terminal = RatatuiTerminal::new(CrosstermBackend::new(stdout()))?;
     terminal.clear()?;
-    let result = Menu::new(&mut terminal).run();
+    let result = Menu::new(RefCell::new(terminal)).run();
 
     terminal_normal_mode()?;
 
@@ -68,13 +69,17 @@ trait Screen {
         while !self.exit() {
             if Instant::now() >= last + Duration::from_secs(1 / 60) {
                 last = Instant::now();
-                self.terminal().draw(|frame| self.render_frame(frame))?;
+
+                // self.terminal().draw(|frame| self.render_frame(frame))?;
             }
 
             if event::poll(Duration::from_secs(1 / 60))? {
                 let event = event::read()?;
                 if let Event::Key(event) = event {
-                    self.handle_key(event)?;
+                    // stops duplicate events on windows
+                    if event.kind == KeyEventKind::Press {
+                        self.handle_key(event)?;
+                    }
                 } else if let Event::Mouse(event) = event {
                     self.handle_mouse(event)?;
                 } else {
@@ -91,24 +96,35 @@ trait Screen {
     fn render_frame(&mut self, frame: &mut Frame);
 
     /// handles all the key input
-    fn handle_key(&mut self, event: KeyEvent) -> TResult<()>;
+    fn handle_key(&mut self, key: KeyEvent) -> TResult<()>;
 
     /// handles the mouse input
-    fn handle_mouse(&mut self, event: MouseEvent) -> TResult<()>;
+    fn handle_mouse(&mut self, mouse: MouseEvent) -> TResult<()>;
 
     /// handles everything not key or mouse related
     /// (guranteed not to be `KeyEvent` or `MouseEvent`)
     fn handle_misc(&mut self, event: Event) -> TResult<()>;
 
     ///getter for the terminal field
-    fn terminal(&self) -> Terminal;
+    fn terminal(&self) -> RefMut<Terminal>;
 
     /// getter determining when to exit
     fn exit(&self) -> bool;
 
+    // unresolved questions:
+
+    // how should the various widgets work
+    // current solution: make them methods/proc funcs if they only have
+    // one behavior, make them proper widgets if I want to
+    // be able to customize their functionaliby?
+    // or just take arguments?
+
+    // arg_widget takes size so I can have a dynamic size? using something
+    // to convert the art on the fly?
+
     // need to decide how I want starting new screens to work
 
-    //how to get terminal to the new screen
+    // how to get terminal to the new screen
     // just pass it terminal, now that it'll have to be a field
 
     // no default contructor
