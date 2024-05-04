@@ -1,8 +1,6 @@
 use termchess_common::TResult;
 
 use {
-    ascii::{Tile, PIECES_ASCII},
-    colored::Colorize,
     std::{
         error::Error,
         fmt::Display,
@@ -11,8 +9,6 @@ use {
         slice::{Iter, IterMut},
     },
 };
-
-mod ascii;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Board {
@@ -89,90 +85,6 @@ impl Board {
         }
     }
 
-    pub fn print(&self, rotation: &PieceColor) -> Result<(), Box<dyn Error>> {
-        let border_line_blank =
-            ascii::BORDER_LINE_BLANK.on_custom_color(ascii::BORDER_BACKGROUND.into());
-        let border_line_letters = (if *rotation == PieceColor::White {
-            ascii::BORDER_LINE_LETTERS
-        } else {
-            ascii::BORDER_LINE_LETTERS_REVERSED
-        })
-        .custom_color(ascii::BORDER_TEXT.into())
-        .on_custom_color(ascii::BORDER_BACKGROUND.into());
-
-        println!(
-            "{}\n{}\n{}",
-            border_line_blank, border_line_letters, border_line_blank
-        );
-
-        // casting to a trait object is required because both possible values
-        // must have the same type
-        let iter: Box<dyn Iterator<Item = (usize, &[Option<(Piece, bool)>; 8])>>;
-        if let PieceColor::Black = *rotation {
-            iter = Box::new(self.pieces.iter().rev().enumerate()) as Box<dyn Iterator<Item = _>>;
-        } else {
-            iter = Box::new(self.pieces.iter().enumerate()) as Box<dyn Iterator<Item = _>>;
-        }
-        for (i, val) in iter {
-            for j in 0..5 {
-                let number = if j == 2 {
-                    if *rotation == PieceColor::Black {
-                        (i + 1).to_string()
-                    } else {
-                        ((i as isize) - 8).abs().to_string()
-                    }
-                } else {
-                    " ".to_string()
-                };
-                print!(
-                    "{}",
-                    format!("{}{}{}", "  ", number, "  ")
-                        .on_custom_color(ascii::BORDER_BACKGROUND.into())
-                );
-                // for k in 0..8 {
-                for k in if PieceColor::Black == *rotation {
-                    Box::new((0..8usize).rev()) as Box<dyn Iterator<Item = _>>
-                } else {
-                    Box::new(0..8usize) as Box<dyn Iterator<Item = _>>
-                } {
-                    // let extract_piece = |tuple: (Piece, bool)| -> Piece {tuple.0};
-                    // .map(|tuple: (Piece, bool)| -> Piece {tuple.0} )
-                    print!(
-                        "{}",
-                        PIECES_ASCII
-                            .get(
-                                // these literals don't coerce to usize for some reason
-                                &(if (((((i % 2) == 0) && ((k % 2usize) == 0usize))
-                                    || (((i % 2) != 0) && ((k % 2usize) != 0usize)))
-                                    && *rotation == PieceColor::White)
-                                    || (((((i % 2) == 0) && ((k % 2usize) != 0usize))
-                                        || (((i % 2) != 0) && ((k % 2usize) == 0usize)))
-                                        && *rotation == PieceColor::Black)
-                                {
-                                    Tile::White(extract_piece(val[k]))
-                                } else {
-                                    Tile::Black(extract_piece(val[k]))
-                                })
-                            )
-                            .ok_or("Failed to retrieve data (001)")?[j]
-                    );
-                }
-                println!(
-                    "{}",
-                    format!("{}{}{}", "  ", number, "  ")
-                        .custom_color(ascii::BORDER_TEXT.into())
-                        .on_custom_color(ascii::BORDER_BACKGROUND.into())
-                );
-            }
-        }
-        println!(
-            "{}\n{}\n{}",
-            border_line_blank, border_line_letters, border_line_blank
-        );
-
-        Ok(())
-    }
-
     /// conditionally move a piece
     pub fn try_move(
         &mut self,
@@ -213,24 +125,25 @@ impl Board {
                     
                     // TODO: extract this to a function
                     let mut input = String::new();
-                    let chosen_piece;
-                    loop {
-                        super::get_input(&mut input);
-                        if let Ok(piece) = Piece::from_str(&input.trim().to_ascii_lowercase(), self.get_piece(piece_position).unwrap().0.color()) {
-                            match piece {
-                                Piece::King(_) | Piece::Pawn(_) => 
-                                    println!("Cannot promote to {}", piece),
+                    let chosen_piece = todo!(); // TODO: fix this, and
+                    // everything else in this file!!!!!
+                    // loop {
+                    //     super::get_input(&mut input);
+                    //     if let Ok(piece) = Piece::from_str(&input.trim().to_ascii_lowercase(), self.get_piece(piece_position).unwrap().0.color()) {
+                    //         match piece {
+                    //             Piece::King(_) | Piece::Pawn(_) => 
+                    //                 println!("Cannot promote to {}", piece),
                                 
-                                _ => {
-                                    chosen_piece = piece;
-                                    break;
-                                }
-                            }
+                    //             _ => {
+                    //                 chosen_piece = piece;
+                    //                 break;
+                    //             }
+                    //         }
 
-                        } else {
-                            println!("Could not parse string. please enter a valid piece name.");
-                        }
-                    }
+                    //     } else {
+                    //         println!("Could not parse string. please enter a valid piece name.");
+                    //     }
+                    // }
 
                     str = Some(format!("{} Pawn at {} Promoted to a {} at {}", self.get_piece(piece_position).unwrap().0.color(), piece_position, chosen_piece, move_position));
 
