@@ -509,11 +509,21 @@ dependencies = [
  "ratatui",
  "strum",
  "strum_macros",
+ "termchess-cli",
+ "termchess-common",
+ "termchess-tui",
 ]
 
 [[package]]
 name = "termchess-cli"
 version = "0.1.0"
+
+[[package]]
+name = "termchess-common"
+version = "0.1.0"
+dependencies = [
+ "clap",
+]
 
 [[package]]
 name = "termchess-engine"
@@ -526,6 +536,13 @@ version = "0.1.0"
 [[package]]
 name = "termchess-tui"
 version = "0.1.0"
+dependencies = [
+ "crossterm",
+ "ratatui",
+ "strum",
+ "strum_macros",
+ "termchess-common",
+]
 
 [[package]]
 name = "unicode-ident"

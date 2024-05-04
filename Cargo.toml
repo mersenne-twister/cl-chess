@@ -12,6 +12,9 @@ license = "MIT OR Apache-2.0"
 members = ["crates/*"]
 
 [dependencies]
+termchess-cli = { path = "crates/termchess-cli" }
+termchess-tui = { path = "crates/termchess-tui" }
+termchess-common = { path = "crates/termchess-common" }
 clap = { version = "4.5.1", features = ["derive"] }
 colored = "2.1.0"
 crossterm = { version = "0.27.0", features = ["event-stream"] }

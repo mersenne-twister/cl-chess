@@ -1,7 +1,6 @@
 use {
     super::{Menu, Terminal},
-    crate::{args::Args, TResult},
-    clap::ValueEnum,
+    // clap::ValueEnum,
     crossterm::{
         event::{self, Event, KeyCode, KeyEventKind},
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},

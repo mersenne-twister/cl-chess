@@ -1,4 +1,4 @@
-use {clap::Parser, termchess::args::Args};
+use {clap::Parser, termchess_common::Args};
 
 fn main() {
     let args = Args::parse();

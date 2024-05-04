@@ -1,6 +1,6 @@
 use {
     super::{ascii, Screen, Terminal},
-    crate::{args::Args, text, TResult},
+    crate::{text, Args, TResult},
     crossterm::{
         event::{
             self, read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent,

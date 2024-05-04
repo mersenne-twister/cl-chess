@@ -2,7 +2,6 @@
 
 use {
     crate::board::Position,
-    args::Args,
     board::{Board, PieceColor},
     std::{
         error::Error,
@@ -10,19 +9,19 @@ use {
         thread,
         time::Duration,
     },
+    termchess_cli,
+    termchess_common::Args,
+    termchess_tui,
 };
 
-pub mod args;
 pub mod board;
 mod cli;
 pub mod parse;
 pub mod text;
-pub mod tui;
-
-pub type TResult<T> = Result<T, Box<dyn Error>>;
 
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
-    tui::run_tui(args)
+    // tui::run_tui(args)
+    termchess_tui::run(args)
 }
 
 pub fn run_cli(args: Args) -> Result<(), Box<dyn Error>> {
