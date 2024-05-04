@@ -183,6 +183,7 @@ impl Screen for Menu {
         Ok(())
     }
 
+    #[allow(unused_variables)]
     fn handle_misc(&mut self, event: Event) -> TResult<()> {
         // nothing to do here (for now)
 

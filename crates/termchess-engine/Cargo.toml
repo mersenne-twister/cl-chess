@@ -7,4 +7,4 @@ description = "The underlying representation of the termchess chess implementati
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-termchess-common = { path = "crates/termchess-common" }
+termchess-common = { path = "../termchess-common" }

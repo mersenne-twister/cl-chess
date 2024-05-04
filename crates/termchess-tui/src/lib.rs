@@ -8,10 +8,7 @@ use {
         ExecutableCommand,
     },
     menu::Menu,
-    ratatui::{
-        prelude::{Terminal as RatatuiTerminal, *},
-        widgets::Paragraph,
-    },
+    ratatui::prelude::{Terminal as RatatuiTerminal, *},
     std::{
         cell::RefCell,
         io::{stdout, Stdout},
@@ -28,6 +25,7 @@ pub mod settings;
 
 pub type Terminal = RatatuiTerminal<CrosstermBackend<Stdout>>;
 
+#[allow(unused_variables)]
 pub fn run(args: Args) -> TResult<()> {
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;

@@ -15,8 +15,8 @@ members = ["crates/*"]
 workspace = true
 
 [workspace.lints.rust]
-dead_code = "allow"
-unused_variables = "allow"
+# dead_code = "allow"
+# unused_variables = "allow"
 
 [dependencies]
 termchess-cli = { path = "crates/termchess-cli" }
