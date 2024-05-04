@@ -1,8 +1,7 @@
 use {
-    core::time,
     crossterm::{
         event::{
-            self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent, KeyEventKind,
+            self, DisableMouseCapture, EnableMouseCapture, Event, KeyEvent, KeyEventKind,
             MouseEvent,
         },
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
@@ -14,9 +13,8 @@ use {
         widgets::Paragraph,
     },
     std::{
-        cell::{RefCell, RefMut},
-        error::Error,
-        io::{self, stdout, Stdout},
+        cell::RefCell,
+        io::{stdout, Stdout},
         panic,
         rc::Rc,
         time::{Duration, Instant},

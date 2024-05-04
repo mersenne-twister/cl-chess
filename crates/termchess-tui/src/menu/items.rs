@@ -1,26 +1,7 @@
 use {
-    super::{Menu, Terminal},
+    super::Menu,
     // clap::ValueEnum,
-    crossterm::{
-        event::{self, Event, KeyCode, KeyEventKind},
-        terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-        ExecutableCommand,
-    },
-    ratatui::{
-        prelude::*,
-        symbols::border,
-        widgets::{
-            block::{Position, Title},
-            Block, Borders, Paragraph,
-        },
-    },
-    std::{
-        error::Error,
-        fmt::Display,
-        io::{self, stdout, Stdout},
-        time::{Duration, Instant},
-    },
-    strum::{EnumCount, IntoEnumIterator},
+    std::fmt::Display,
     strum_macros::{EnumCount as EnumCountMacro, EnumIter, FromRepr},
 };
 

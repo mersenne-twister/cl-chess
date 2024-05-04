@@ -1,35 +1,19 @@
 use {
     super::{ascii, Screen, Terminal},
-    crate::{text, Args, TResult},
-    crossterm::{
-        event::{
-            self, read, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent,
-            KeyEventKind, KeyModifiers, MouseButton, MouseEventKind,
-        },
-        terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-        ExecutableCommand,
-    },
+    crate::TResult,
+    crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEventKind},
     items::Item,
     ratatui::{
         layout::Position,
-        prelude::{Terminal as RatatuiTerminal, *},
+        prelude::*,
         symbols::border,
         widgets::{
             block::{Position as TermPosition, Title},
             Block, Borders, Paragraph,
         },
     },
-    std::{
-        borrow::Borrow,
-        cell::{RefCell, RefMut},
-        error::Error,
-        io::{self, stdout, Stdout},
-        ops::RangeBounds,
-        rc::Rc,
-        time::{Duration, Instant},
-    },
+    std::{cell::RefCell, rc::Rc},
     strum::{EnumCount, IntoEnumIterator},
-    strum_macros::{EnumCount as EnumCountMacro, EnumIter, FromRepr},
 };
 
 pub mod items;

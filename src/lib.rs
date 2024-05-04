@@ -1,15 +1,10 @@
-#![allow(unused_imports)]
-
 use {
     crate::board::Position,
     board::{Board, PieceColor},
     std::{
         error::Error,
         io::{self, Write},
-        thread,
-        time::Duration,
     },
-    termchess_cli,
     termchess_common::Args,
     termchess_tui,
 };
