@@ -31,11 +31,11 @@ pub struct Menu {
 impl Menu {
     pub fn new(terminal: Rc<RefCell<Terminal>>) -> Self {
         Self {
-            terminal,
             current: 0,
             exit: false,
             items_pos: Position::default(),
             mouse_pos: Position::default(),
+            terminal,
         }
     }
 

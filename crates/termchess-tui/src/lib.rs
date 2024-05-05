@@ -20,6 +20,7 @@ use {
 };
 
 pub mod ascii;
+pub mod game;
 pub mod menu;
 pub mod settings;
 

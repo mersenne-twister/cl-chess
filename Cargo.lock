@@ -511,6 +511,7 @@ dependencies = [
  "strum_macros",
  "termchess-cli",
  "termchess-common",
+ "termchess-engine",
  "termchess-tui",
 ]
 
@@ -545,6 +546,7 @@ dependencies = [
  "strum",
  "strum_macros",
  "termchess-common",
+ "termchess-engine",
 ]
 
 [[package]]

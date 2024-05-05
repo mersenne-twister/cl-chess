@@ -7,7 +7,8 @@ description = "Crate to hold the tui application for termchess"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-termchess-common = {path = "../termchess-common"}
+termchess-common = { path = "../termchess-common" }
+termchess-engine = { path = "../termchess-engine" }
 crossterm = { version = "0.27.0", features = ["event-stream"] }
 ratatui = { version = "0.26.2" }
 strum = { version = "0.26.2", features = ["strum_macros", "derive"] }

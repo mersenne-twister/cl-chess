@@ -1,7 +1,6 @@
-use termchess_common::TResult;
-
 use {
-    std::{
+termchess_common::TResult,    
+std::{
         error::Error,
         fmt::Display,
         iter::Flatten,
