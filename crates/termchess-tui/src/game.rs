@@ -27,9 +27,11 @@ impl Game {
     }
 
     fn board_widget(&self) -> TResult<Paragraph> {
-        let board = self.board.print_to_string(&PieceColor::White)?;
+        // let board = self.board.print_to_string(&PieceColor::White)?;
 
-        Ok(Paragraph::new(Text::from(board)))
+        // Ok(Paragraph::new(Text::from(board)))
+
+        todo!()
     }
 }
 

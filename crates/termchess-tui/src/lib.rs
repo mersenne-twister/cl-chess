@@ -46,6 +46,8 @@ pub fn run(args: Args) -> TResult<()> {
 
     terminal_normal_mode()?;
 
+    let _ = panic::take_hook();
+
     result
 }
 

@@ -1,6 +1,6 @@
 use {
     super::Game,
-    ascii::{Tile, PIECES_ASCII},
+    ascii::Tile,
     ratatui::{
         style::{Color, Stylize},
         widgets::Paragraph,
@@ -16,9 +16,9 @@ pub mod ascii;
 pub enum Size {
     Letters,
     UnicodeSymbols,
-    BlockArt,
     #[default]
     UnicodeArt,
+    BlockArt,
     TbdLarge,
 }
 
@@ -28,6 +28,15 @@ pub enum Frame {
     Ascii,
     #[default]
     Unicode,
+}
+
+impl Frame {
+    fn get_char(&self, ch: FrameChar) -> char {
+        match *self {
+            Self::Ascii => todo!(),
+            Self::Unicode => todo!(),
+        }
+    }
 }
 
 enum FrameChar {
@@ -92,6 +101,9 @@ pub struct Theme {
     board_black: Color,
     piece_white: Color,
     piece_black: Color,
+    frame: Color,
+    axis_text: Color,
+    axis_background: Color,
 }
 
 impl Default for Theme {

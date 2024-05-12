@@ -24,50 +24,52 @@ impl Board {
         Self {
             pieces: [
                 [
-                    Some((Piece::Rook(PieceColor::Black), false)),
-                    Some((Piece::Knight(PieceColor::Black), false)),
-                    Some((Piece::Bishop(PieceColor::Black), false)),
-                    Some((Piece::Queen(PieceColor::Black), false)),
-                    Some((Piece::King(PieceColor::Black), false)),
-                    Some((Piece::Bishop(PieceColor::Black), false)),
-                    Some((Piece::Knight(PieceColor::Black), false)),
-                    Some((Piece::Rook(PieceColor::Black), false)),
+                    // Some((Piece::Rook(PieceColor::Black), false)),
+                    // Some((Piece::new(PieceName::Rook, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Rook, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Knight, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Bishop, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Queen, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::King, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Bishop, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Knight, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Rook, PieceColor::Black), false)),
                 ],
                 [
-                    Some((Piece::Pawn(PieceColor::Black), false)),
-                    Some((Piece::Pawn(PieceColor::Black), false)),
-                    Some((Piece::Pawn(PieceColor::Black), false)),
-                    Some((Piece::Pawn(PieceColor::Black), false)),
-                    Some((Piece::Pawn(PieceColor::Black), false)),
-                    Some((Piece::Pawn(PieceColor::Black), false)),
-                    Some((Piece::Pawn(PieceColor::Black), false)),
-                    Some((Piece::Pawn(PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::Black), false)),
                 ],
                 [None, None, None, None, None, None, None, None],
-                [None, Some((Piece::Pawn(PieceColor::White), false)), None, None, None, None, None, None],
+                [None, Some((Piece::new(PieceName::Pawn, PieceColor::White), false)), None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 // [None, None, None, None, None, None, None, None],
                 // [None, None, None, None, None, None, None, None],
                 [
-                    Some((Piece::Pawn(PieceColor::White), false)),
-                    Some((Piece::Pawn(PieceColor::White), false)),
-                    Some((Piece::Pawn(PieceColor::White), false)),
-                    Some((Piece::Pawn(PieceColor::White), false)),
-                    Some((Piece::Pawn(PieceColor::White), false)),
-                    Some((Piece::Pawn(PieceColor::White), false)),
-                    Some((Piece::Pawn(PieceColor::White), false)),
-                    Some((Piece::Pawn(PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Pawn, PieceColor::White), false)),
                 ],
                 [
-                    Some((Piece::Rook(PieceColor::White), false)),
-                    Some((Piece::Knight(PieceColor::White), false)),
-                    Some((Piece::Bishop(PieceColor::White), false)),
-                    Some((Piece::Queen(PieceColor::White), false)),
-                    Some((Piece::King(PieceColor::White), false)),
-                    Some((Piece::Bishop(PieceColor::White), false)),
-                    Some((Piece::Knight(PieceColor::White), false)),
-                    Some((Piece::Rook(PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Rook, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Knight, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Bishop, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Queen, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::King, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Bishop, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Knight, PieceColor::White), false)),
+                    Some((Piece::new(PieceName::Rook, PieceColor::White), false)),
                 ],
                 // [
                 //     Some((Piece::Rook(PieceColor::White), false)),
@@ -111,7 +113,7 @@ impl Board {
                     self.move_piece(piece_position, move_position);
                 },
                 Some(SpecialMove::Castle(side)) => {
-                    str = Some(format!("{} king at {} castled {} to {}", self.get_piece(piece_position).unwrap().0.color(), piece_position, side, move_position));
+                    str = Some(format!("{} king at {} castled {} to {}", self.get_piece(piece_position).unwrap().0.piece_color, piece_position, side, move_position));
 
                     let king = *self.get_piece(piece_position);
                     let rook = *self.get_piece(move_position);
@@ -149,7 +151,7 @@ impl Board {
                     //     }
                     // }
 
-                    str = Some(format!("{} Pawn at {} Promoted to a {} at {}", self.get_piece(piece_position).unwrap().0.color(), piece_position, chosen_piece, move_position));
+                    str = Some(format!("{} Pawn at {} Promoted to a {} at {}", self.get_piece(piece_position).unwrap().0.piece_color, piece_position, chosen_piece, move_position));
 
                     if self.get_piece(move_position).is_some() {
                         str = Some(format!("{} and captured a {}", str.unwrap(), self.get_piece(move_position).unwrap().0))
@@ -198,8 +200,8 @@ impl Board {
 
         let piece = piece.expect("we've verified piece_position is at a piece");
 
-        match piece.0 {
-            Piece::Pawn(_) => {
+        match piece.0.piece_name {
+            PieceName::Pawn => {
                 // if moving forward 1, check that there is no piece there
                 // if moving forward 2, check that it's the first time that pawn has moved
                 // if capturing, check that there's a capturable piece where it's moving
@@ -208,9 +210,9 @@ impl Board {
 
                 if piece_position.num == move_position.num {
                     return (None, Some("Pawns cannot move to the side".to_owned()));
-                } else if ((piece_position.num > move_position.num) && (piece.0.color() == PieceColor::White))
+                } else if ((piece_position.num > move_position.num) && (piece.0.piece_color == PieceColor::White))
                 ||
-                ((piece_position.num < move_position.num) && (piece.0.color() == PieceColor::Black)) {
+                ((piece_position.num < move_position.num) && (piece.0.piece_color == PieceColor::Black)) {
                     return (None, Some("Pawns cannot move backwards".to_owned()));
                 }
                 // else if (move_position.num + 1) > piece_position.num {
@@ -278,15 +280,15 @@ impl Board {
                     // if normal capture, do nothing
 
                     if move_location.is_none() {
-                        let passant_pos = Position::from_literals(move_position.letter, if piece.0.color() == PieceColor::White {5} else {4});
-                        if let Some((Piece::Pawn(_), _)) = self.get_piece(&passant_pos) {
+                        let passant_pos = Position::from_literals(move_position.letter, if piece.0.piece_color == PieceColor::White {5} else {4});
+                        if let Some(PieceName::Pawn) = self.get_piece(&passant_pos).map(|v| v.0.piece_name) {
                             let piece_move = self.moves.last().expect("can't reach this on the first turn");
                             if (piece_move.end_position != passant_pos) ||
                                     piece_move.moved_piece.1 {
                                         return (None, Some("Can only capture a pawn by en passant that that just moved".to_owned()));
                             } else {
                                 special_move = Some(SpecialMove::EnPassant(passant_pos));
-                                move_message = Some(format!("{} Pawn at {} captured a Pawn at {} via en passant and is now at {}", piece.0.color(), piece_position, passant_pos, move_position));
+                                move_message = Some(format!("{} Pawn at {} captured a Pawn at {} via en passant and is now at {}", piece.0.piece_color, piece_position, passant_pos, move_position));
                                 // return (Some(SpecialMove::EnPassant(passant_pos)), Some(format!("{} Pawn at {} captured a Pawn at {} via en passant and is now at {}", piece.0.color(), piece_position, passant_pos, move_position)));
                             }
                         } else {
@@ -314,7 +316,7 @@ impl Board {
 
                 // todo!();
             }
-            Piece::Knight(_) => {
+            PieceName::Knight => {
                 // verify that movement is offset by 2-1
                 // aka it's position must be within 2 in both directions, and not be axial or diagonal
                 // DONE
@@ -339,7 +341,7 @@ impl Board {
                     );
                 }
             }
-            Piece::Bishop(_) => {
+            PieceName::Bishop => {
                 // verify that movement is diagonal of it, and no pieces in the way
                 // DONE
 
@@ -357,7 +359,7 @@ impl Board {
                     );
                 }
             }
-            Piece::Rook(_) => {
+            PieceName::Rook => {
                 // verify movement is on same row or same column,
                 // and there are no pieces in between
                 // if castling, say must castle with king
@@ -371,8 +373,8 @@ impl Board {
                 }
 
                 // if let guards/chaining currently unstable unfortunately
-                match move_location {
-                    Some((Piece::King(color), _)) if *color == piece.0.color() => {
+                match move_location.map(|v| (v.0.piece_name, v.0.piece_color)) {
+                    Some((PieceName::King, color)) if color == piece.0.piece_color => {
                         return (
                             None,
                             Some(
@@ -394,7 +396,7 @@ impl Board {
                     );
                 }
             }
-            Piece::Queen(_) => {
+            PieceName::Queen => {
                 // verify that movement is either diagonal or vertical/horizontal,
                 // and no pieces in way
                 // DONE
@@ -423,13 +425,13 @@ impl Board {
                     );
                 }
             }
-            Piece::King(_) => {
+            PieceName::King => {
                 // verify that movement is either diagonal or horizontal,
                 // and not more than one piece
                 // if caslting swap and don't move somehow
 
                 // detect if castling
-                if Some(Piece::Rook(piece.0.color())) == move_location.map(|t| t.0) {
+                if Some((PieceName::Rook, piece.0.piece_color)) == move_location.map(|v| (v.0.piece_name, v.0.piece_color)) {
                     // attempting to castle
 
                     if piece.1 || move_location.unwrap().1 {
@@ -463,7 +465,7 @@ impl Board {
             }
         }
 
-        if (move_location.is_some() && (piece.0.color() == move_location.unwrap().0.color())) && special_move.is_none() {
+        if (move_location.is_some() && (piece.0.piece_color == move_location.unwrap().0.piece_color)) && special_move.is_none() {
             return (
                 None,
                 Some("A piece cannot capture a piece of its own color".to_string()),
@@ -474,7 +476,7 @@ impl Board {
         if move_location.is_some() && move_message.is_none() {
             move_message = Some(format!(
                 "{} {} at {} Captured {} at {}",
-                piece.0.color(),
+                piece.0.piece_color,
                 piece.0,
                 piece_position,
                 move_location.unwrap().0,
@@ -569,7 +571,7 @@ impl Board {
 
     /// unconditionally move a piece
     fn move_piece(&mut self, piece_position: &Position, move_position: &Position) {
-        if let Some((Piece::King(_), _)) = self.get_piece(move_position) {
+        if let Some(PieceName::King) = self.get_piece(move_position).map(|v| v.0.piece_name) {
             panic!("Check invariant was not upheld, attempted to capture King.");
         }
         
@@ -755,50 +757,65 @@ impl Error for BoardError {
 }
 
 #[derive(Hash, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
-pub enum Piece {
+pub struct Piece {
+    piece_name: PieceName,
+    piece_color: PieceColor,
+}
+
+impl Piece {
+    pub fn new(piece_name: PieceName, piece_color: PieceColor) -> Self {
+        Self {
+            piece_name,
+            piece_color,
+        }
+    }
+}
+
+#[derive(Hash, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub enum PieceName {
     // ordered by point amount
-    Pawn(PieceColor), // TODO: add has_moved
-    Knight(PieceColor),
-    Bishop(PieceColor),
-    Rook(PieceColor), // TODO: add has_moved
-    Queen(PieceColor),
-    King(PieceColor), // TODO: add has_moved
+    Pawn, // TODO: add has_moved
+    Knight,
+    Bishop,
+    Rook, // TODO: add has_moved
+    Queen,
+    King, // TODO: add has_moved
 }
 
 impl Piece {
     fn from_str(str: &str, color: PieceColor) -> Result<Self, BoardError> {
         match str.to_ascii_lowercase().as_str() {
-            "pawn" => Ok(Piece::Pawn(color)),
-            "knight" => Ok(Piece::Knight(color)),
-            "bishop" => Ok(Piece::Bishop(color)),
-            "rook" => Ok(Piece::Rook(color)),
-            "queen" => Ok(Piece::Queen(color)),
-            "king" => Ok(Piece::King(color)),
+            "pawn" => Ok(Piece::new(PieceName::Pawn, color)),
+            "knight" => Ok(Piece::new(PieceName::Knight, color)),
+            "bishop" => Ok(Piece::new(PieceName::Bishop, color)),
+            "rook" => Ok(Piece::new(PieceName::Rook, color)),
+            "queen" => Ok(Piece::new(PieceName::Queen, color)),
+            "king" => Ok(Piece::new(PieceName::King, color)),
             _ => Err(BoardError::ParseError),
         }
     }
 
-    fn color(&self) -> PieceColor {
-        match *self {
-            Piece::Pawn(color) => color,
-            Piece::Knight(color) => color,
-            Piece::Bishop(color) => color,
-            Piece::Rook(color) => color,
-            Piece::Queen(color) => color,
-            Piece::King(color) => color,
-        }
-    }
+    // fn color(&self) -> PieceColor {
+    //     match *self {
+    //         Piece::Pawn(color) => color,
+    //         Piece::Knight(color) => color,
+    //         Piece::Bishop(color) => color,
+    //         Piece::Rook(color) => color,
+    //         Piece::Queen(color) => color,
+    //         Piece::King(color) => color,
+    //     }
+    // }
 }
 
 impl Display for Piece {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            Piece::Pawn(_) => write!(f, "pawn"),
-            Piece::Knight(_) => write!(f, "knight"),
-            Piece::Bishop(_) => write!(f, "bishop"),
-            Piece::Rook(_) => write!(f, "rook"),
-            Piece::Queen(_) => write!(f, "queen"),
-            Piece::King(_) => write!(f, "king"),
+        match self.piece_name {
+            PieceName::Pawn => write!(f, "pawn"),
+            PieceName::Knight => write!(f, "knight"),
+            PieceName::Bishop => write!(f, "bishop"),
+            PieceName::Rook => write!(f, "rook"),
+            PieceName::Queen => write!(f, "queen"),
+            PieceName::King => write!(f, "king"),
         }
     }
 }
