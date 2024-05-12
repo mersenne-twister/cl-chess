@@ -178,7 +178,7 @@ impl Screen for Menu {
         self.mouse_pos = Position::new(mouse.column, mouse.row);
         if mouse.kind == MouseEventKind::Down(MouseButton::Left) {
             if let Some(item) = self.mouse_over_item() {
-                item.handle(self);
+                item.handle(self)?;
             }
         }
 

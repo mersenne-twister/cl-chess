@@ -609,7 +609,7 @@ impl Board {
     }
 }
 
-fn extract_piece(piece: Option<(Piece, bool)>) -> Option<Piece> {
+pub fn extract_piece(piece: Option<(Piece, bool)>) -> Option<Piece> {
     if let Some(tuple) = piece {
         Some(tuple.0)
     } else {

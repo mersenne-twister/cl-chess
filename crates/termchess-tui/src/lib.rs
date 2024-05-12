@@ -8,10 +8,7 @@ use {
         ExecutableCommand,
     },
     menu::Menu,
-    ratatui::{
-        prelude::{Terminal as RatatuiTerminal, *},
-        style::{Color, Stylize},
-    },
+    ratatui::prelude::{Terminal as RatatuiTerminal, *},
     std::{
         cell::RefCell,
         io::{stdout, Stdout},
