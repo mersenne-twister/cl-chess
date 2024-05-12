@@ -1,5 +1,6 @@
 use {
 termchess_common::TResult,    
+crossterm::style::{Color, Stylize},
 std::{
         error::Error,
         fmt::Display,
@@ -8,6 +9,9 @@ std::{
         slice::{Iter, IterMut},
     },
 };
+
+pub mod ascii;
+pub mod print;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Board {
@@ -83,6 +87,7 @@ impl Board {
             moves: Vec::new(),
         }
     }
+
 
     /// conditionally move a piece
     pub fn try_move(

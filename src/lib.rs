@@ -15,8 +15,9 @@ pub mod parse;
 pub mod text;
 
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
-    // tui::run_tui(args)
     termchess_tui::run(args)
+    // run_cli(args)
+    // todo!()
 }
 
 pub fn run_cli(args: Args) -> Result<(), Box<dyn Error>> {

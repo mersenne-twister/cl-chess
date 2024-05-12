@@ -1,8 +1,9 @@
 use {
     super::Menu,
-    // clap::ValueEnum,
+    crate::{game::Game, Screen},
     std::fmt::Display,
     strum_macros::{EnumCount as EnumCountMacro, EnumIter, FromRepr},
+    termchess_common::TResult,
 };
 
 /// in order for them to allign correctly, they have to all use either
@@ -20,12 +21,14 @@ pub enum Item {
 }
 
 impl Item {
-    pub fn handle(&self, menu: &mut Menu) {
+    pub fn handle(&self, menu: &mut Menu) -> TResult<()> {
         match self {
-            Self::CommenceDefault => todo!(),
+            Self::CommenceDefault => Game::new(menu.terminal.clone()).run()?,
             Self::Settings => todo!(),
             Self::Quit => menu.exit = true,
         }
+
+        Ok(())
     }
 }
 

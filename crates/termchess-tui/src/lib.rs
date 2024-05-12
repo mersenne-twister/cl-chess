@@ -8,7 +8,10 @@ use {
         ExecutableCommand,
     },
     menu::Menu,
-    ratatui::prelude::{Terminal as RatatuiTerminal, *},
+    ratatui::{
+        prelude::{Terminal as RatatuiTerminal, *},
+        style::{Color, Stylize},
+    },
     std::{
         cell::RefCell,
         io::{stdout, Stdout},
@@ -72,7 +75,7 @@ trait Screen {
                 // terminal.draw(|frame| self.render_frame(frame))?;
                 Rc::clone(self.terminal())
                     .borrow_mut()
-                    .draw(|frame| self.render_frame(frame))?;
+                    .draw(|frame| self.render_frame(frame).unwrap())?;
             }
 
             if event::poll(Duration::from_secs(1 / 60))? {
@@ -95,7 +98,7 @@ trait Screen {
 
     /// function to handle rendering
     /// reccomended to use only for layout, and use getter functions for the widgets
-    fn render_frame(&mut self, frame: &mut Frame);
+    fn render_frame(&mut self, frame: &mut Frame) -> TResult<()>;
 
     /// handles all the key input
     fn handle_key(&mut self, key: KeyEvent) -> TResult<()>;

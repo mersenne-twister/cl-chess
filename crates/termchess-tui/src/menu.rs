@@ -6,6 +6,7 @@ use {
     ratatui::{
         layout::Position,
         prelude::*,
+        style::Color,
         symbols::border,
         widgets::{
             block::{Position as TermPosition, Title},
@@ -84,7 +85,7 @@ impl Menu {
         for (i, item) in items_unstyled.iter().enumerate() {
             items_styled.push(Line::from({
                 let item = if i == self.current as usize {
-                    format!("<{}>", item).magenta() //.bold()
+                    format!("<{}>", item).magenta().bg(Color::Green) //.bold()
                 } else {
                     item.clone().white() // can't move out of Vec
                 };
@@ -105,7 +106,7 @@ impl Menu {
 }
 
 impl Screen for Menu {
-    fn render_frame(&mut self, frame: &mut Frame) {
+    fn render_frame(&mut self, frame: &mut Frame) -> TResult<()> {
         let layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
@@ -139,6 +140,8 @@ impl Screen for Menu {
 
         frame.render_widget(art_widget(), canvas_layout[1]);
         frame.render_widget(self.items_widget(), items_layout[1]);
+
+        Ok(())
     }
 
     fn handle_key(&mut self, key: KeyEvent) -> TResult<()> {
@@ -157,12 +160,11 @@ impl Screen for Menu {
                 KeyCode::Enter => {
                     Item::from_repr(self.current)
                         .expect("should be within bounds")
-                        .handle(self);
+                        .handle(self)?;
                 }
                 _ => (),
             }
-        }
-        if key.modifiers == KeyModifiers::CONTROL {
+        } else if key.modifiers == KeyModifiers::CONTROL {
             match key.code {
                 KeyCode::Char('c') => self.exit = true,
                 _ => (),

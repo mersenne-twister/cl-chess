@@ -530,6 +530,9 @@ dependencies = [
 name = "termchess-engine"
 version = "0.1.0"
 dependencies = [
+ "crossterm",
+ "lazy_static",
+ "ratatui",
  "termchess-common",
 ]
 
