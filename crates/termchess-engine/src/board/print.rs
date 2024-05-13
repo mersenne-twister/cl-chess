@@ -1,5 +1,9 @@
 use {
-    crate::board::{self, ascii::Tile, Board, Color as ChessColor, Piece},
+    crate::board::{
+        self,
+        ascii::{FrameChar, Tile},
+        Board, Color as ChessColor, Piece,
+    },
     // super::Game,
     ratatui::{
         style::{Color, Stylize},
@@ -32,59 +36,6 @@ pub enum Frame {
     Ascii,
     #[default]
     Unicode,
-}
-
-impl Frame {
-    fn get_char(&self, ch: FrameChar) -> char {
-        match *self {
-            Self::Ascii => match ch {
-                FrameChar::TopLeft => '-',
-                FrameChar::TopRight => '-',
-                FrameChar::BotLeft => '-',
-                FrameChar::BotRight => '-',
-                FrameChar::OuterVertical => '|',
-                FrameChar::OuterHoriz => '-',
-                FrameChar::TopIntersection => '-',
-                FrameChar::BotIntersection => '-',
-                FrameChar::LeftIntersection => '|',
-                FrameChar::RightIntersection => '|',
-                FrameChar::InnerVertical => '|',
-                FrameChar::InnerHoriz => '-',
-                FrameChar::InnerIntersection => '|',
-            },
-            Self::Unicode => match ch {
-                FrameChar::TopLeft => '╔',
-                FrameChar::TopRight => '╗',
-                FrameChar::BotLeft => '╚',
-                FrameChar::BotRight => '╝',
-                FrameChar::OuterVertical => '║',
-                FrameChar::OuterHoriz => '═',
-                FrameChar::TopIntersection => '╤',
-                FrameChar::BotIntersection => '╧',
-                FrameChar::LeftIntersection => '╟',
-                FrameChar::RightIntersection => '╢',
-                FrameChar::InnerVertical => '│',
-                FrameChar::InnerHoriz => '─',
-                FrameChar::InnerIntersection => '┼',
-            },
-        }
-    }
-}
-
-enum FrameChar {
-    TopLeft,
-    TopRight,
-    BotLeft,
-    BotRight,
-    OuterVertical,
-    OuterHoriz,
-    TopIntersection,
-    BotIntersection,
-    LeftIntersection,
-    RightIntersection,
-    InnerVertical,
-    InnerHoriz,
-    InnerIntersection,
 }
 
 pub struct Axis {
@@ -129,6 +80,13 @@ impl Default for Axis {
     }
 }
 
+// themename struct, with lists of themes, and you pass a variant to theme::new?
+pub enum ThemeName {
+    Foo,
+    Bar,
+    Baz,
+}
+
 pub struct Theme {
     board_white: Color,
     board_black: Color,
@@ -141,6 +99,14 @@ pub struct Theme {
 }
 
 impl Theme {
+    pub fn new(name: ThemeName) -> Self {
+        match name {
+            ThemeName::Foo => todo!(),
+            ThemeName::Bar => todo!(),
+            ThemeName::Baz => todo!(),
+        }
+    }
+
     pub fn get_board(&self, tile: Tile) -> Color {
         if tile.board_color == ChessColor::White {
             self.board_white
@@ -150,11 +116,6 @@ impl Theme {
     }
 
     pub fn get_piece(&self, tile: Tile) -> Option<Color> {
-        // if tile.piece.color == ChessColor::White {
-        //     self.piece_white
-        // } else {
-        //     self.piece_black
-        // }.
         tile.piece.map(|v| {
             if v.color == ChessColor::White {
                 self.board_white

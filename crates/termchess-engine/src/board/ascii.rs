@@ -1,7 +1,7 @@
 use {
     // super::{BoardOptions, Size, Theme},
     crate::board::{
-        print::{BoardOptions, Size, Theme},
+        print::{BoardOptions, Frame, Size, Theme},
         Color as ChessColor, Piece, PieceName,
     },
     lazy_static::lazy_static,
@@ -20,7 +20,7 @@ pub struct Tile {
     pub piece: Option<Piece>,
 }
 
-// // done so that these are accessible from board.rs
+// done so that these are accessible from board.rs
 // // pub const BOARD_BLACK: Color = Color::Rgb{r: 216, g: 135, b: 85};
 // pub const BOARD_BLACK: Color = Color::Rgb(177, 97, 60);
 // // pub const BOARD_WHITE: Color = Color::Rgb{r: 254, g: 210, b: 169};
@@ -39,67 +39,66 @@ pub struct Tile {
 // pub const BORDER_LINE_LETTERS_REVERSED: &str =
 //     "         H        G        F        E        D        C        B        A         ";
 
+pub enum FrameChar {
+    TopLeft,
+    TopRight,
+    BotLeft,
+    BotRight,
+    OuterVertical,
+    OuterHoriz,
+    TopIntersection,
+    BotIntersection,
+    LeftIntersection,
+    RightIntersection,
+    InnerVertical,
+    InnerHoriz,
+    InnerIntersection,
+}
+
+impl Frame {
+    fn get_char(&self, ch: FrameChar) -> char {
+        match *self {
+            Self::Ascii => match ch {
+                FrameChar::TopLeft => '-',
+                FrameChar::TopRight => '-',
+                FrameChar::BotLeft => '-',
+                FrameChar::BotRight => '-',
+                FrameChar::OuterVertical => '|',
+                FrameChar::OuterHoriz => '-',
+                FrameChar::TopIntersection => '-',
+                FrameChar::BotIntersection => '-',
+                FrameChar::LeftIntersection => '|',
+                FrameChar::RightIntersection => '|',
+                FrameChar::InnerVertical => '|',
+                FrameChar::InnerHoriz => '-',
+                FrameChar::InnerIntersection => '|',
+            },
+            Self::Unicode => match ch {
+                FrameChar::TopLeft => '╔',
+                FrameChar::TopRight => '╗',
+                FrameChar::BotLeft => '╚',
+                FrameChar::BotRight => '╝',
+                FrameChar::OuterVertical => '║',
+                FrameChar::OuterHoriz => '═',
+                FrameChar::TopIntersection => '╤',
+                FrameChar::BotIntersection => '╧',
+                FrameChar::LeftIntersection => '╟',
+                FrameChar::RightIntersection => '╢',
+                FrameChar::InnerVertical => '│',
+                FrameChar::InnerHoriz => '─',
+                FrameChar::InnerIntersection => '┼',
+            },
+        }
+    }
+}
+
 impl BoardOptions {
     fn get_tile(&self, tile: Tile) -> Vec<Vec<Span<'_>>> {
-        match &self.size {
-            // Size::Letters {
-            //     different_symbols: diff,
-            // } => {
-            //     if *diff {
-            //         todo!()
-            //     }
-
-            //     vec![vec![self.set_colors(
-            //         match tile.piece.map(|v| v.name) {
-            //             None => " ",
-            //             Some(PieceName::Pawn) => "P",
-            //             Some(PieceName::Knight) => "N",
-            //             Some(PieceName::Bishop) => "B",
-            //             Some(PieceName::Rook) => "R",
-            //             Some(PieceName::Queen) => "Q",
-            //             Some(PieceName::King) => "K",
-            //         },
-            //         tile,
-            //     )]]
-            // }
-            // Size::UnicodeSymbols {
-            //     different_symbols: diff,
-            // } => {
-            //     if *diff {
-            //         todo!()
-            //     }
-
-            //     vec![vec![self.set_colors(
-            //         match tile.piece.map(|v| v.name) {
-            //             None => " ",
-            //             Some(PieceName::Pawn) => "♟︎",
-            //             Some(PieceName::Knight) => "♞",
-            //             Some(PieceName::Bishop) => "♝",
-            //             Some(PieceName::Rook) => "♜",
-            //             Some(PieceName::Queen) => "♛",
-            //             Some(PieceName::King) => "♚",
-            //         },
-            //         tile,
-            //     )]]
-            // }
-
-            // Size::UnicodeArt => {
-            //     todo!()
-            // }
-            // Size::TbdLarge => todo!(),
-
-            // match against all that share same fg & bg color
-            Size::Letters { .. }
-            | Size::UnicodeSymbols { .. }
-            | Size::UnicodeArt
-            | Size::TbdLarge => self
-                .size
-                .get_chars(tile.piece)
-                .iter()
-                .map(|str| vec![self.set_colors((*str).clone(), tile)])
-                .collect(),
-            Size::BlockArt => todo!(),
-        }
+        self.size
+            .get_chars(tile.piece)
+            .iter()
+            .map(|str| vec![self.set_colors((*str).clone(), tile)])
+            .collect()
     }
 
     fn set_colors(&self, str: String, tile: Tile) -> Span<'_> {
@@ -120,6 +119,7 @@ impl Size {
             } => vec![if !diff
                 || piece.map(|v| v.color).unwrap_or(ChessColor::White) == ChessColor::White
             {
+                // first one is used normally, latter for black pieces if `diff`
                 match name {
                     None => " ",
                     Some(PieceName::Pawn) => "P",
@@ -146,6 +146,7 @@ impl Size {
             } => vec![if !diff
                 || piece.map(|v| v.color).unwrap_or(ChessColor::White) == ChessColor::White
             {
+                // see above arm
                 match name {
                     None => " ",
                     Some(PieceName::Pawn) => "♟︎",
@@ -168,7 +169,7 @@ impl Size {
             }
             .to_string()],
             Size::UnicodeArt => Vec::from(match name {
-                // see `/chess-pieces` (in root dir)
+                // see `/chess-pieces` (in root dir) to see pieces
                 None => ["     ", "     ", "     ", "     "],
                 Some(PieceName::Pawn) => ["     ", "  •  ", "  │  ", "  ┴  "],
                 // find one that combines first and second
@@ -184,9 +185,11 @@ impl Size {
             .iter()
             .map(|str| format!("  {}  ", str))
             .collect(),
+            // probably make this one with blocks
+            Size::BlockArt => todo!(),
+            // some large one, haven't decided the style
+            // can always add more anyways, not that hard
             Size::TbdLarge => todo!(),
-            // this fn only used for that fancy @ match arm above
-            Size::BlockArt => unreachable!(),
         }
     }
 }
