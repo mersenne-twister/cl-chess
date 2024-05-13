@@ -4,7 +4,7 @@ use {
     ratatui::{layout::Position, prelude::*, widgets::Paragraph},
     std::{cell::RefCell, rc::Rc},
     termchess_common::TResult,
-    termchess_engine::board::{Board, PieceColor},
+    termchess_engine::board::{Board, Color},
 };
 
 pub mod board;

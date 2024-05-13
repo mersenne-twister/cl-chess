@@ -1,18 +1,20 @@
 use {
-    super::{Size, Theme},
+    super::{BoardOptions, Size, Theme},
     lazy_static::lazy_static,
     ratatui::{
         style::{Color, Stylize},
         text::Span,
     },
     std::collections::HashMap,
-    termchess_engine::board::{Piece, PieceColor, PieceName},
+    termchess_engine::board::{Color as ChessColor, Piece, PieceName},
 };
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone, PartialOrd)]
-pub enum Tile {
-    Black(Option<Piece>),
-    White(Option<Piece>),
+pub struct Tile {
+    // Black(Option<Piece>),
+    // White(Option<Piece>),
+    pub board_color: ChessColor,
+    pub piece: Option<Piece>,
 }
 
 // // done so that these are accessible from board.rs
@@ -34,19 +36,67 @@ pub enum Tile {
 // pub const BORDER_LINE_LETTERS_REVERSED: &str =
 //     "         H        G        F        E        D        C        B        A         ";
 
-impl Size {
-    fn get_tile(&self, tile: Tile, theme: Theme) -> Vec<Vec<Span<'_>>> {
-        match *self {
-            Self::Letters => todo!(),
-            Self::UnicodeSymbols => todo!(),
-            Self::UnicodeArt => todo!(),
-            Self::BlockArt => todo!(),
-            Self::TbdLarge => todo!(),
-        }
+impl BoardOptions {
+    fn get_tile(&self, tile: Tile) -> Vec<Vec<Span<'_>>> {
+        match self.size {
+            Size::Letters {
+                different_symbols: diff,
+            } => {
+                if diff {
+                    todo!()
+                }
 
-        todo!()
+                vec![vec![self.set_colors(
+                    match tile.piece.map(|v| v.name) {
+                        None => " ",
+                        Some(PieceName::Pawn) => "P",
+                        Some(PieceName::Knight) => "N",
+                        Some(PieceName::Bishop) => "B",
+                        Some(PieceName::Rook) => "R",
+                        Some(PieceName::Queen) => "Q",
+                        Some(PieceName::King) => "K",
+                    },
+                    tile,
+                )]]
+            }
+            Size::UnicodeSymbols {
+                different_symbols: diff,
+            } => {
+                if diff {
+                    todo!()
+                }
+
+                vec![vec![self.set_colors(
+                    match tile.piece.map(|v| v.name) {
+                        None => " ",
+                        Some(PieceName::Pawn) => "♟︎",
+                        Some(PieceName::Knight) => "♞",
+                        Some(PieceName::Bishop) => "♝",
+                        Some(PieceName::Rook) => "♜",
+                        Some(PieceName::Queen) => "♛",
+                        Some(PieceName::King) => "♚",
+                    },
+                    tile,
+                )]]
+            }
+            Size::UnicodeArt => {
+                todo!()
+            }
+            Size::BlockArt => todo!(),
+            Size::TbdLarge => todo!(),
+        }
+    }
+
+    fn set_colors(&self, str: &'static str, tile: Tile) -> Span<'_> {
+        // str.bg(self.theme.get_board(tile))
+        self.theme
+            .get_piece(tile)
+            .map_or_else(|| Span::from(str), |c| str.fg(c))
+            .bg(self.theme.get_board(tile))
     }
 }
+
+impl Piece {}
 
 fn make_hashmap() -> HashMap<(Tile, Size), Vec<Vec<Span<'static>>>> {
     // let mut pieces_ascii = HashMap::new();

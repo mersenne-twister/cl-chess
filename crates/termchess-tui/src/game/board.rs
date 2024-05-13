@@ -7,15 +7,19 @@ use {
     },
     std::error::Error,
     termchess_common::TResult,
-    termchess_engine::board::{self, Board, Piece, PieceColor},
+    termchess_engine::board::{self, Board, Color as ChessColor, Piece},
 };
 
 pub mod ascii;
 
 #[derive(Default)]
 pub enum Size {
-    Letters,
-    UnicodeSymbols,
+    Letters {
+        different_symbols: bool,
+    },
+    UnicodeSymbols {
+        different_symbols: bool,
+    },
     #[default]
     UnicodeArt,
     BlockArt,
@@ -33,8 +37,36 @@ pub enum Frame {
 impl Frame {
     fn get_char(&self, ch: FrameChar) -> char {
         match *self {
-            Self::Ascii => todo!(),
-            Self::Unicode => todo!(),
+            Self::Ascii => match ch {
+                FrameChar::TopLeft => '-',
+                FrameChar::TopRight => '-',
+                FrameChar::BotLeft => '-',
+                FrameChar::BotRight => '-',
+                FrameChar::OuterVertical => '|',
+                FrameChar::OuterHoriz => '-',
+                FrameChar::TopIntersection => '-',
+                FrameChar::BotIntersection => '-',
+                FrameChar::LeftIntersection => '|',
+                FrameChar::RightIntersection => '|',
+                FrameChar::InnerVertical => '|',
+                FrameChar::InnerHoriz => '-',
+                FrameChar::InnerIntersection => '|',
+            },
+            Self::Unicode => match ch {
+                FrameChar::TopLeft => '╔',
+                FrameChar::TopRight => '╗',
+                FrameChar::BotLeft => '╚',
+                FrameChar::BotRight => '╝',
+                FrameChar::OuterVertical => '║',
+                FrameChar::OuterHoriz => '═',
+                FrameChar::TopIntersection => '╤',
+                FrameChar::BotIntersection => '╧',
+                FrameChar::LeftIntersection => '╟',
+                FrameChar::RightIntersection => '╢',
+                FrameChar::InnerVertical => '│',
+                FrameChar::InnerHoriz => '─',
+                FrameChar::InnerIntersection => '┼',
+            },
         }
     }
 }
@@ -44,14 +76,15 @@ enum FrameChar {
     TopRight,
     BotLeft,
     BotRight,
-    OuterVerticalSide,
-    OuterVerticalSideIntersection,
-    OuterHorizSide,
-    OuterHorizSideIntersection,
-    InnerVerticalSide,
-    InnerVerticalSideIntersection,
-    InnerHorizSide,
-    InnerHorizSideIntersection,
+    OuterVertical,
+    OuterHoriz,
+    TopIntersection,
+    BotIntersection,
+    LeftIntersection,
+    RightIntersection,
+    InnerVertical,
+    InnerHoriz,
+    InnerIntersection,
 }
 
 pub struct Axis {
@@ -101,9 +134,35 @@ pub struct Theme {
     board_black: Color,
     piece_white: Color,
     piece_black: Color,
-    frame: Color,
-    axis_text: Color,
-    axis_background: Color,
+    frame_fg: Color,
+    frame_bg: Color,
+    axis_fg: Color,
+    axis_bg: Color,
+}
+
+impl Theme {
+    fn get_board(&self, tile: Tile) -> Color {
+        if tile.board_color == ChessColor::White {
+            self.board_white
+        } else {
+            self.board_black
+        }
+    }
+
+    fn get_piece(&self, tile: Tile) -> Option<Color> {
+        // if tile.piece.color == ChessColor::White {
+        //     self.piece_white
+        // } else {
+        //     self.piece_black
+        // }.
+        tile.piece.map(|v| {
+            if v.color == ChessColor::White {
+                self.board_white
+            } else {
+                self.board_black
+            }
+        })
+    }
 }
 
 impl Default for Theme {
@@ -121,6 +180,7 @@ struct BoardOptions {
 }
 
 fn board_widget(game: Game, options: BoardOptions) -> Paragraph<'static> {
+    // use unicode characters tempoarily
     todo!()
 }
 
