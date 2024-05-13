@@ -96,13 +96,13 @@ impl BoardOptions {
                 .size
                 .get_chars(tile.piece)
                 .iter()
-                .map(|str| vec![self.set_colors(str, tile)])
+                .map(|str| vec![self.set_colors((*str).clone(), tile)])
                 .collect(),
             Size::BlockArt => todo!(),
         }
     }
 
-    fn set_colors<'a>(&'a self, str: &'a str, tile: Tile) -> Span<'_> {
+    fn set_colors(&self, str: String, tile: Tile) -> Span<'_> {
         // str.bg(self.theme.get_board(tile))
         self.theme
             .get_piece(tile)
