@@ -20,6 +20,12 @@ pub struct Tile {
     pub piece: Option<Piece>,
 }
 
+impl Tile {
+    pub fn new(board_color: ChessColor, piece: Option<Piece>) -> Self {
+        Self { board_color, piece }
+    }
+}
+
 // done so that these are accessible from board.rs
 // // pub const BOARD_BLACK: Color = Color::Rgb{r: 216, g: 135, b: 85};
 // pub const BOARD_BLACK: Color = Color::Rgb(177, 97, 60);
@@ -93,7 +99,7 @@ impl Frame {
 }
 
 impl BoardOptions {
-    fn get_tile(&self, tile: Tile) -> Vec<Vec<Span<'_>>> {
+    pub fn get_tile(&self, tile: Tile) -> Vec<Vec<Span<'_>>> {
         self.size
             .get_chars(tile.piece)
             .iter()

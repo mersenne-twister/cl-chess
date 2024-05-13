@@ -7,14 +7,14 @@ use {
     // super::Game,
     ratatui::{
         style::{Color, Stylize},
-        text::Text,
+        text::{Line, Text},
         widgets::Paragraph,
     },
     std::error::Error,
     termchess_common::TResult,
 };
 
-#[derive(Default)]
+#[derive(Default, PartialEq, Eq)]
 pub enum Size {
     /// bool makes black lowercase
     Letters {
@@ -140,9 +140,72 @@ pub struct BoardOptions {
     pub theme: Theme,
 }
 
+impl BoardOptions {
+    /// return width|height of board
+    pub fn breadth(&self) -> usize {
+        todo!()
+    }
+
+    ///  return the lines in one tile
+    pub fn tile_lines(&self) -> usize {
+        todo!()
+    }
+
+    /// return cols in one tile
+    pub fn tile_cols(&self) -> usize {
+        todo!()
+    }
+}
+
 // highlight: Option<Position>
 impl Board {
-    pub fn print(&self) -> Text {
+    pub fn print(&self, options: BoardOptions, rotation: &ChessColor) -> Text {
+        assert!(options.frame.is_none());
+        assert!(
+            options.size
+                == Size::Letters {
+                    different_symbols: false
+                }
+        );
+
+        let text = Vec::new();
+
+        // casting to a trait object is required because both possible values
+        // must have the same type
+        let iter: Box<dyn Iterator<Item = (usize, &[Option<(Piece, bool)>; 8])>>;
+        if let ChessColor::Black = *rotation {
+            iter = Box::new(self.pieces.iter().rev().enumerate()) as Box<dyn Iterator<Item = _>>;
+        } else {
+            iter = Box::new(self.pieces.iter().enumerate()) as Box<dyn Iterator<Item = _>>;
+        }
+        for (i, row) in iter {
+            for j in 0..options.tile_lines() {
+                for k in if ChessColor::Black == *rotation {
+                    Box::new((0..8usize).rev()) as Box<dyn Iterator<Item = _>>
+                } else {
+                    Box::new(0..8usize) as Box<dyn Iterator<Item = _>>
+                } {
+                    text.push(Line::from(
+                        //
+                        options.get_tile(Tile::new(
+                            if (((((i % 2) == 0) && ((k % 2usize) == 0usize))
+                                || (((i % 2) != 0) && ((k % 2usize) != 0usize)))
+                                && *rotation == ChessColor::White)
+                                || (((((i % 2) == 0) && ((k % 2usize) != 0usize))
+                                    || (((i % 2) != 0) && ((k % 2usize) == 0usize)))
+                                    && *rotation == ChessColor::Black)
+                            {
+                                ChessColor::White
+                            } else {
+                                ChessColor::Black
+                            },
+                            row[k].map(|v| v.0),
+                        ))[j],
+                    ));
+                }
+            }
+        }
+
         todo!()
     }
 }
