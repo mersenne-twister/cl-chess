@@ -541,6 +541,14 @@ name = "termchess-learning"
 version = "0.1.0"
 
 [[package]]
+name = "termchess-netcode"
+version = "0.1.0"
+
+[[package]]
+name = "termchess-server"
+version = "0.1.0"
+
+[[package]]
 name = "termchess-tui"
 version = "0.1.0"
 dependencies = [

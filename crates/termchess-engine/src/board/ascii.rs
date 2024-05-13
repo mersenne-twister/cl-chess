@@ -1,12 +1,15 @@
 use {
-    super::{BoardOptions, Size, Theme},
+    // super::{BoardOptions, Size, Theme},
+    crate::board::{
+        print::{BoardOptions, Size, Theme},
+        Color as ChessColor, Piece, PieceName,
+    },
     lazy_static::lazy_static,
     ratatui::{
         style::{Color, Stylize},
         text::Span,
     },
     std::collections::HashMap,
-    termchess_engine::board::{Color as ChessColor, Piece, PieceName},
 };
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone, PartialOrd)]
@@ -38,304 +41,152 @@ pub struct Tile {
 
 impl BoardOptions {
     fn get_tile(&self, tile: Tile) -> Vec<Vec<Span<'_>>> {
-        match self.size {
-            Size::Letters {
-                different_symbols: diff,
-            } => {
-                if diff {
-                    todo!()
-                }
+        match &self.size {
+            // Size::Letters {
+            //     different_symbols: diff,
+            // } => {
+            //     if *diff {
+            //         todo!()
+            //     }
 
-                vec![vec![self.set_colors(
-                    match tile.piece.map(|v| v.name) {
-                        None => " ",
-                        Some(PieceName::Pawn) => "P",
-                        Some(PieceName::Knight) => "N",
-                        Some(PieceName::Bishop) => "B",
-                        Some(PieceName::Rook) => "R",
-                        Some(PieceName::Queen) => "Q",
-                        Some(PieceName::King) => "K",
-                    },
-                    tile,
-                )]]
-            }
-            Size::UnicodeSymbols {
-                different_symbols: diff,
-            } => {
-                if diff {
-                    todo!()
-                }
+            //     vec![vec![self.set_colors(
+            //         match tile.piece.map(|v| v.name) {
+            //             None => " ",
+            //             Some(PieceName::Pawn) => "P",
+            //             Some(PieceName::Knight) => "N",
+            //             Some(PieceName::Bishop) => "B",
+            //             Some(PieceName::Rook) => "R",
+            //             Some(PieceName::Queen) => "Q",
+            //             Some(PieceName::King) => "K",
+            //         },
+            //         tile,
+            //     )]]
+            // }
+            // Size::UnicodeSymbols {
+            //     different_symbols: diff,
+            // } => {
+            //     if *diff {
+            //         todo!()
+            //     }
 
-                vec![vec![self.set_colors(
-                    match tile.piece.map(|v| v.name) {
-                        None => " ",
-                        Some(PieceName::Pawn) => "♟︎",
-                        Some(PieceName::Knight) => "♞",
-                        Some(PieceName::Bishop) => "♝",
-                        Some(PieceName::Rook) => "♜",
-                        Some(PieceName::Queen) => "♛",
-                        Some(PieceName::King) => "♚",
-                    },
-                    tile,
-                )]]
-            }
-            Size::UnicodeArt => {
-                todo!()
-            }
+            //     vec![vec![self.set_colors(
+            //         match tile.piece.map(|v| v.name) {
+            //             None => " ",
+            //             Some(PieceName::Pawn) => "♟︎",
+            //             Some(PieceName::Knight) => "♞",
+            //             Some(PieceName::Bishop) => "♝",
+            //             Some(PieceName::Rook) => "♜",
+            //             Some(PieceName::Queen) => "♛",
+            //             Some(PieceName::King) => "♚",
+            //         },
+            //         tile,
+            //     )]]
+            // }
+
+            // Size::UnicodeArt => {
+            //     todo!()
+            // }
+            // Size::TbdLarge => todo!(),
+
+            // match against all that share same fg & bg color
+            Size::Letters { .. }
+            | Size::UnicodeSymbols { .. }
+            | Size::UnicodeArt
+            | Size::TbdLarge => self
+                .size
+                .get_chars(tile.piece)
+                .iter()
+                .map(|str| vec![self.set_colors(str, tile)])
+                .collect(),
             Size::BlockArt => todo!(),
-            Size::TbdLarge => todo!(),
         }
     }
 
-    fn set_colors(&self, str: &'static str, tile: Tile) -> Span<'_> {
+    fn set_colors<'a>(&'a self, str: &'a str, tile: Tile) -> Span<'_> {
         // str.bg(self.theme.get_board(tile))
         self.theme
             .get_piece(tile)
-            .map_or_else(|| Span::from(str), |c| str.fg(c))
+            .map_or_else(|| Span::from(str.clone()), |c| str.clone().fg(c))
             .bg(self.theme.get_board(tile))
     }
 }
 
-impl Piece {}
-
-fn make_hashmap() -> HashMap<(Tile, Size), Vec<Vec<Span<'static>>>> {
-    // let mut pieces_ascii = HashMap::new();
-
-    // let board_black = BOARD_BLACK.into();
-    // let board_white = BOARD_WHITE.into();
-    // let piece_black = PIECE_BLACK.into();
-    // let piece_white = PIECE_WHITE.into();
-
-    // let blank = [
-    //     vec!["         "],
-    //     vec!["         "],
-    //     vec!["         "],
-    //     vec!["         "],
-    //     vec!["         "],
-    // ];
-
-    // let pawn = [
-    //     vec!["         "],
-    //     vec!["    ", " ", "    "],
-    //     vec!["   ", "   ", "   "],
-    //     vec!["    ", " ", "    "],
-    //     vec!["   ", "   ", "   "],
-    // ];
-
-    // let knight = [
-    //     vec!["    ", "  ", "   "],
-    //     vec!["  ", "     ", "  "],
-    //     vec![" ", "  ", " ", "    ", " "],
-    //     vec!["   ", "    ", "  "],
-    //     vec!["  ", "     ", "  "],
-    // ];
-
-    // let bishop = [
-    //     vec!["    ", " ", "    "],
-    //     vec!["   ", "   ", "   "],
-    //     vec!["   ", "   ", "   "],
-    //     vec!["    ", " ", "    "],
-    //     vec!["  ", "     ", "  "],
-    // ];
-
-    // let rook = [
-    //     vec!["  ", " ", " ", " ", " ", " ", "  "],
-    //     vec!["  ", "     ", "  "],
-    //     vec!["   ", "   ", "   "],
-    //     vec!["   ", "   ", "   "],
-    //     vec!["  ", "     ", "  "],
-    // ];
-
-    // let queen = [
-    //     vec![" ", " ", "  ", " ", "  ", " ", " "],
-    //     vec!["  ", " ", " ", " ", " ", " ", "  "],
-    //     vec!["   ", "   ", "   "],
-    //     vec!["   ", "   ", "   "],
-    //     vec!["  ", "     ", "  "],
-    // ];
-
-    // let king = [
-    //     vec!["    ", " ", "    "],
-    //     vec![" ", "  ", " ", " ", " ", "  ", " "],
-    //     vec!["", " ", "  ", " ", " ", " ", "  ", " "],
-    //     vec![" ", " ", "  ", " ", "  ", " ", " "],
-    //     // vec!["", "    ", " ", "    "],
-    //     // vec![" ", "       ", " "],
-    //     vec!["  ", "     ", "  "],
-    // ];
-
-    // // create an array of the pieces we need to iterate over
-    // // let pieces = [
-    // //     &[None][..],
-    // //     &[pawn, knight, bishop, rook, queen, king].map(|piece| Some(piece)),
-    // // ]
-    // // .concat();
-    // let pieces = [pawn, knight, bishop, rook, queen, king];
-
-    // for piece in pieces {
-    //     pieces_ascii.insert(
-    //         Tile::Black(Some(Piece::new(PieceName::Pawn, PieceColor::White))),
-    //         make_piece(&piece, board_black, Some(piece_white)),
-    //     );
-    //     pieces_ascii.insert(
-    //         Tile::White(Some(Piece::new(PieceName::Pawn, PieceColor::White))),
-    //         make_piece(&piece, board_white, Some(piece_white)),
-    //     );
-    //     pieces_ascii.insert(
-    //         Tile::Black(Some(Piece::new(PieceName::Pawn, PieceColor::Black))),
-    //         make_piece(&piece, board_black, Some(piece_black)),
-    //     );
-    //     pieces_ascii.insert(
-    //         Tile::White(Some(Piece::new(PieceName::Pawn, PieceColor::Black))),
-    //         make_piece(&piece, board_white, Some(piece_black)),
-    //     );
-    // }
-
-    // // pieces_ascii.insert(Tile::Black(None), make_piece(&blank, board_black, None));
-    // // pieces_ascii.insert(Tile::White(None), make_piece(&blank, board_white, None));
-
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Pawn(PieceColor::White))),
-    // //     make_piece(&pawn, board_black, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Pawn(PieceColor::White))),
-    // //     make_piece(&pawn, board_white, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Pawn(PieceColor::Black))),
-    // //     make_piece(&pawn, board_black, Some(piece_black)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Pawn(PieceColor::Black))),
-    // //     make_piece(&pawn, board_white, Some(piece_black)),
-    // // );
-
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Knight(PieceColor::White))),
-    // //     make_piece(&knight, board_black, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Knight(PieceColor::White))),
-    // //     make_piece(&knight, board_white, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Knight(PieceColor::Black))),
-    // //     make_piece(&knight, board_black, Some(piece_black)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Knight(PieceColor::Black))),
-    // //     make_piece(&knight, board_white, Some(piece_black)),
-    // // );
-
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Bishop(PieceColor::White))),
-    // //     make_piece(&bishop, board_black, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Bishop(PieceColor::White))),
-    // //     make_piece(&bishop, board_white, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Bishop(PieceColor::Black))),
-    // //     make_piece(&bishop, board_black, Some(piece_black)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Bishop(PieceColor::Black))),
-    // //     make_piece(&bishop, board_white, Some(piece_black)),
-    // // );
-
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Rook(PieceColor::White))),
-    // //     make_piece(&rook, board_black, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Rook(PieceColor::White))),
-    // //     make_piece(&rook, board_white, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Rook(PieceColor::Black))),
-    // //     make_piece(&rook, board_black, Some(piece_black)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Rook(PieceColor::Black))),
-    // //     make_piece(&rook, board_white, Some(piece_black)),
-    // // );
-
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Queen(PieceColor::White))),
-    // //     make_piece(&queen, board_black, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Queen(PieceColor::White))),
-    // //     make_piece(&queen, board_white, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::Queen(PieceColor::Black))),
-    // //     make_piece(&queen, board_black, Some(piece_black)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::Queen(PieceColor::Black))),
-    // //     make_piece(&queen, board_white, Some(piece_black)),
-    // // );
-
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::King(PieceColor::White))),
-    // //     make_piece(&king, board_black, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::King(PieceColor::White))),
-    // //     make_piece(&king, board_white, Some(piece_white)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::Black(Some(Piece::King(PieceColor::Black))),
-    // //     make_piece(&king, board_black, Some(piece_black)),
-    // // );
-    // // pieces_ascii.insert(
-    // //     Tile::White(Some(Piece::King(PieceColor::Black))),
-    // //     make_piece(&king, board_white, Some(piece_black)),
-    // // );
-
-    // pieces_ascii
-
-    todo!()
-}
-
-lazy_static! {
-    // pub static ref PIECES_ASCII: HashMap<Tile, [ColoredString; 5]> = {
-        pub static ref PIECES_ASCII: HashMap<(Tile, Size), Vec<Vec<Span<'static>>>> = {
-            make_hashmap()
-    };
-}
-
-/// Construct a piece from string literals, and the colour of the background and piece
-///
-/// # Invariants:
-/// Assumes that the piece begins with white.
-/// * To get around this, have the first value in the vec be `""`
-///
-/// # Panics:
-/// Will panic if piece_colour is `None` and the len of any of the widths is higher than 1
-fn make_piece(
-    widths: &[Vec<&str>; 5],
-    tile_colour: Color,
-    piece_colour: Option<Color>,
-) -> [String; 5] {
-    let mut piece: [String; 5] = Default::default();
-
-    for (i, line) in widths.iter().enumerate() {
-        let mut section = String::new();
-        for (j, string) in line.iter().enumerate() {
-            section.push_str(
-                &(if j & 1 == 0 {
-                    format!("{}", string.bg(tile_colour))
-                } else {
-                    format!("{}", string.bg(piece_colour.unwrap()))
-                }),
-            );
+impl Size {
+    fn get_chars(&self, piece: Option<Piece>) -> Vec<String> {
+        let name = piece.map(|v| v.name);
+        match self {
+            Size::Letters {
+                different_symbols: diff,
+            } => vec![if !diff
+                || piece.map(|v| v.color).unwrap_or(ChessColor::White) == ChessColor::White
+            {
+                match name {
+                    None => " ",
+                    Some(PieceName::Pawn) => "P",
+                    Some(PieceName::Knight) => "N",
+                    Some(PieceName::Bishop) => "B",
+                    Some(PieceName::Rook) => "R",
+                    Some(PieceName::Queen) => "Q",
+                    Some(PieceName::King) => "K",
+                }
+            } else {
+                match name {
+                    None => unreachable!(),
+                    Some(PieceName::Pawn) => "p",
+                    Some(PieceName::Knight) => "n",
+                    Some(PieceName::Bishop) => "b",
+                    Some(PieceName::Rook) => "r",
+                    Some(PieceName::Queen) => "q",
+                    Some(PieceName::King) => "k",
+                }
+            }
+            .to_string()],
+            Size::UnicodeSymbols {
+                different_symbols: diff,
+            } => vec![if !diff
+                || piece.map(|v| v.color).unwrap_or(ChessColor::White) == ChessColor::White
+            {
+                match name {
+                    None => " ",
+                    Some(PieceName::Pawn) => "♟︎",
+                    Some(PieceName::Knight) => "♞",
+                    Some(PieceName::Bishop) => "♝",
+                    Some(PieceName::Rook) => "♜",
+                    Some(PieceName::Queen) => "♛",
+                    Some(PieceName::King) => "♚",
+                }
+            } else {
+                match name {
+                    None => unreachable!(),
+                    Some(PieceName::Pawn) => "♙",
+                    Some(PieceName::Knight) => "♘",
+                    Some(PieceName::Bishop) => "♗",
+                    Some(PieceName::Rook) => "♖",
+                    Some(PieceName::Queen) => "♕",
+                    Some(PieceName::King) => "♔",
+                }
+            }
+            .to_string()],
+            Size::UnicodeArt => Vec::from(match name {
+                // see `/chess-pieces` (in root dir)
+                None => ["     ", "     ", "     ", "     "],
+                Some(PieceName::Pawn) => ["     ", "  •  ", "  │  ", "  ┴  "],
+                // find one that combines first and second
+                Some(PieceName::Knight) => ["  ╥  ", " /╣  ", "  ║  ", "  ╨  "],
+                // make shorter?
+                Some(PieceName::Bishop) => ["  │  ", "  ║  ", "  │  ", "  ┴  "],
+                // move top down one?
+                Some(PieceName::Rook) => [" ╘╬╛ ", "  ║  ", "  ║  ", "  ╨  "],
+                // use ☼ instead op •?
+                Some(PieceName::Queen) => ["• • •", " \\╫/ ", "  ║  ", "  ╨  "],
+                Some(PieceName::King) => ["  +  ", "  ╫  ", "  ║  ", "  ╨  "],
+            })
+            .iter()
+            .map(|str| format!("  {}  ", str))
+            .collect(),
+            Size::TbdLarge => todo!(),
+            // this fn only used for that fancy @ match arm above
+            Size::BlockArt => unreachable!(),
         }
-        piece[i].push_str(&section);
     }
-
-    piece
 }

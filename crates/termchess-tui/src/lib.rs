@@ -9,7 +9,7 @@ use {
         ExecutableCommand,
     },
     menu::Menu,
-    ratatui::{prelude::{Terminal as RatatuiTerminal, *}, },
+    ratatui::prelude::{Terminal as RatatuiTerminal, *},
     std::{
         cell::RefCell,
         io::{stdout, Stdout},
@@ -29,17 +29,17 @@ pub type Terminal = RatatuiTerminal<CrosstermBackend<Stdout>>;
 
 #[allow(unused_variables)]
 pub fn run(args: Args) -> TResult<()> {
-    println!(
-        "{} {}\n{} {}\n{} {}",
-        "♔".on(crossterm::style::Color::AnsiValue(216)),
-        "♚".on(crossterm::style::Color::AnsiValue(216)),
-        "♔".white().on(crossterm::style::Color::AnsiValue(216)),
-        "♚".white().on(crossterm::style::Color::AnsiValue(216)),
-        "♔".black().on(crossterm::style::Color::AnsiValue(216)),
-        "♚".black().on(crossterm::style::Color::AnsiValue(216)),
-    );
+    // println!(
+    //     "{} {}\n{} {}\n{} {}",
+    //     "♔".on(crossterm::style::Color::AnsiValue(216)),
+    //     "♚".on(crossterm::style::Color::AnsiValue(216)),
+    //     "♔".white().on(crossterm::style::Color::AnsiValue(216)),
+    //     "♚".white().on(crossterm::style::Color::AnsiValue(216)),
+    //     "♔".black().on(crossterm::style::Color::AnsiValue(216)),
+    //     "♚".black().on(crossterm::style::Color::AnsiValue(216)),
+    // );
 
-    todo!();
+    // todo!();
 
     stdout().execute(EnterAlternateScreen)?;
     enable_raw_mode()?;
