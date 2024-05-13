@@ -4,7 +4,10 @@ use {
     ratatui::{layout::Position, prelude::*, widgets::Paragraph},
     std::{cell::RefCell, rc::Rc},
     termchess_common::TResult,
-    termchess_engine::board::{Board, Color},
+    termchess_engine::board::{
+        print::{BoardOptions, Size},
+        Board, Color,
+    },
 };
 
 pub mod board;
@@ -27,11 +30,14 @@ impl Game {
     }
 
     fn board_widget(&self) -> TResult<Paragraph> {
-        // let board = self.board.print_to_string(&PieceColor::White)?;
+        let mut options = BoardOptions::default();
+        options.size = Size::Letters {
+            different_symbols: false,
+        };
 
-        // Ok(Paragraph::new(Text::from(board)))
+        let board = self.board.print(options, &Color::White);
 
-        todo!()
+        Ok(Paragraph::new(board))
     }
 }
 

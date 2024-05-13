@@ -85,7 +85,7 @@ impl Menu {
         for (i, item) in items_unstyled.iter().enumerate() {
             items_styled.push(Line::from({
                 let item = if i == self.current as usize {
-                    format!("<{}>", item).magenta().bg(Color::Green) //.bold()
+                    format!("<{}>", item).magenta() //.bg(Color::Green) //.bold()
                 } else {
                     item.clone().white() // can't move out of Vec
                 };
