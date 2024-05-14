@@ -121,9 +121,9 @@ impl Theme {
     pub fn get_piece(&self, tile: Tile) -> Option<Color> {
         tile.piece.map(|v| {
             if v.color == ChessColor::White {
-                self.board_white
+                self.piece_white
             } else {
-                self.board_black
+                self.piece_black
             }
         })
     }
@@ -172,41 +172,37 @@ impl BoardOptions {
 
 // highlight: Option<Position>
 impl Board {
-    pub fn print(&self, options: BoardOptions, rotation: &ChessColor) -> Text {
+    pub fn print<'a>(&self, options: &'a BoardOptions, rotation: ChessColor) -> Text<'a> {
         assert!(options.frame.is_none());
-        assert!(
-            options.size
-                == Size::Letters {
-                    different_symbols: false
-                }
-        );
 
         let mut text = Vec::new();
 
         // casting to a trait object is required because both possible values
         // must have the same type
         let iter: Box<dyn Iterator<Item = (usize, &[Option<(Piece, bool)>; 8])>>;
-        if let ChessColor::Black = *rotation {
+        if let ChessColor::Black = rotation {
             iter = Box::new(self.pieces.iter().rev().enumerate()) as Box<dyn Iterator<Item = _>>;
         } else {
             iter = Box::new(self.pieces.iter().enumerate()) as Box<dyn Iterator<Item = _>>;
         }
         for (i, row) in iter {
             for j in 0..options.tile_lines() {
-                for k in if ChessColor::Black == *rotation {
+                // make vec of spans
+                let spans = Vec::new();
+                for k in if ChessColor::Black == rotation {
                     Box::new((0..8usize).rev()) as Box<dyn Iterator<Item = _>>
                 } else {
                     Box::new(0..8usize) as Box<dyn Iterator<Item = _>>
                 } {
                     text.push(Line::from(
-                        //
-                        options.clone().get_tile(Tile::new(
+                        // push spans
+                        options.get_tile(Tile::new(
                             if (((((i % 2) == 0) && ((k % 2usize) == 0usize))
                                 || (((i % 2) != 0) && ((k % 2usize) != 0usize)))
-                                && *rotation == ChessColor::White)
+                                && rotation == ChessColor::White)
                                 || (((((i % 2) == 0) && ((k % 2usize) != 0usize))
                                     || (((i % 2) != 0) && ((k % 2usize) == 0usize)))
-                                    && *rotation == ChessColor::Black)
+                                    && rotation == ChessColor::Black)
                             {
                                 ChessColor::White
                             } else {
@@ -218,6 +214,7 @@ impl Board {
                             .clone(),
                     ));
                 }
+                // push line from vec of spans
             }
         }
 

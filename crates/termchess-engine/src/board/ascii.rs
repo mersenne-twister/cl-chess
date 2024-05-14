@@ -111,7 +111,7 @@ impl BoardOptions {
         // str.bg(self.theme.get_board(tile))
         self.theme
             .get_piece(tile)
-            .map_or_else(|| Span::from(str.clone()), |c| str.clone().fg(c))
+            .map_or_else(|| Span::from(str.clone()), |c| str.clone().fg(c).bold())
             .bg(self.theme.get_board(tile))
     }
 }

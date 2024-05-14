@@ -17,6 +17,7 @@ pub struct Game {
     exit: bool,
     mouse_pos: Position,
     terminal: Rc<RefCell<Terminal>>,
+    board_options: BoardOptions,
 }
 
 impl Game {
@@ -26,19 +27,26 @@ impl Game {
             exit: false,
             mouse_pos: Position::default(),
             terminal,
+            board_options: BoardOptions {
+                // size: Size::Letters {
+                //     different_symbols: false,
+                // },
+                size: Size::UnicodeArt,
+                ..Default::default()
+            },
         }
     }
 
-    fn board_widget(&self) -> TResult<Paragraph> {
-        let mut options = BoardOptions::default();
-        options.size = Size::Letters {
-            different_symbols: false,
-        };
+    // fn board_widget(&self) -> TResult<Paragraph> {
+    //     let mut options = BoardOptions::default();
+    //     options.size = Size::Letters {
+    //         different_symbols: false,
+    //     };
 
-        let board = self.board.print(options, &Color::White);
+    //     let board = self.board.print(options, &Color::White);
 
-        Ok(Paragraph::new(board))
-    }
+    //     Ok(Paragraph::new(board))
+    // }
 }
 
 #[allow(unused_variables)]
