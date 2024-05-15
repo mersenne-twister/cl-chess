@@ -18,6 +18,10 @@ workspace = true
 # dead_code = "allow"
 # unused_variables = "allow"
 
+[workspace.lints.clippy]
+cargo_common_metadata = "warn"
+# allow_attributes = "warn"
+
 [dependencies]
 termchess-cli = { path = "crates/termchess-cli" }
 termchess-tui = { path = "crates/termchess-tui" }

@@ -33,9 +33,17 @@ pub enum Size {
 // hold Option<Frame>
 #[derive(Default, Clone, Copy)]
 pub enum Frame {
-    Ascii,
+    Single,
     #[default]
-    Unicode,
+    Double,
+    Quadruple,
+}
+
+#[derive(Clone, Copy, Default)]
+pub enum Thickness {
+    Thin,
+    #[default]
+    Thick,
 }
 
 #[derive(Clone, Copy)]
@@ -73,20 +81,37 @@ impl Axis {
             right: false,
         }
     }
+
+    // are the other ones necessary?
+    fn new(top: bool, bottom: bool, left: bool, right: bool) -> Self {
+        Self {
+            top,
+            bottom,
+            left,
+            right,
+        }
+    }
 }
 
 impl Default for Axis {
     fn default() -> Self {
-        Self::new_all()
+        Self::new_left_bottom()
     }
 }
 
-// themename struct, with lists of themes, and you pass a variant to theme::new?
 #[derive(Clone, Copy)]
 pub enum ThemeName {
-    Foo,
-    Bar,
-    Baz,
+    // what themes do I actually want
+    WhiteBlue,
+    WoodBrown,
+    GruvBox,
+    Dracula,
+    Solarized,
+    Doom, // black and red, see if I can force it to be super black
+    Trans,
+    Enby,
+    Bi,
+    Ace,
 }
 
 #[derive(Clone)]
@@ -104,9 +129,7 @@ pub struct Theme {
 impl Theme {
     pub fn new(name: ThemeName) -> Self {
         match name {
-            ThemeName::Foo => todo!(),
-            ThemeName::Bar => todo!(),
-            ThemeName::Baz => todo!(),
+            _ => todo!(),
         }
     }
 
@@ -148,6 +171,8 @@ impl Default for Theme {
 pub struct BoardOptions {
     pub size: Size,
     pub frame: Option<Frame>,
+    /// a physical separation between squares so one can play without colour
+    pub compat_frame: bool,
     pub axis: Axis,
     pub theme: Theme,
 }
@@ -160,8 +185,13 @@ impl BoardOptions {
 
     ///  return the lines in one tile
     pub fn tile_lines(&self) -> usize {
-        // todo!()
-        1
+        match self.size {
+            Size::Letters { .. } => 1,
+            Size::UnicodeSymbols { .. } => 1,
+            Size::UnicodeArt => 4,
+            Size::BlockArt => 5,
+            Size::TbdLarge => todo!(),
+        }
     }
 
     /// return cols in one tile
@@ -169,6 +199,8 @@ impl BoardOptions {
         todo!()
     }
 }
+
+//
 
 // highlight: Option<Position>
 impl Board {
@@ -188,15 +220,16 @@ impl Board {
         for (i, row) in iter {
             for j in 0..options.tile_lines() {
                 // make vec of spans
-                let spans = Vec::new();
+                let mut spans = Vec::new();
                 for k in if ChessColor::Black == rotation {
                     Box::new((0..8usize).rev()) as Box<dyn Iterator<Item = _>>
                 } else {
                     Box::new(0..8usize) as Box<dyn Iterator<Item = _>>
                 } {
-                    text.push(Line::from(
+                    // text.push(Line::from(
+                    spans.extend_from_slice(
                         // push spans
-                        options.get_tile(Tile::new(
+                        &options.get_tile(Tile::new(
                             if (((((i % 2) == 0) && ((k % 2usize) == 0usize))
                                 || (((i % 2) != 0) && ((k % 2usize) != 0usize)))
                                 && rotation == ChessColor::White)
@@ -212,9 +245,10 @@ impl Board {
                             Option::map(row[k], |v: (Piece, bool)| v.0),
                         ))[j]
                             .clone(),
-                    ));
+                    );
                 }
                 // push line from vec of spans
+                text.push(Line::from(spans));
             }
         }
 

@@ -1,5 +1,5 @@
 use {
-    super::{ascii, Screen, Terminal},
+    super::{Screen, Terminal},
     crate::TResult,
     crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEventKind},
     items::Item,
@@ -17,6 +17,7 @@ use {
     strum::{EnumCount, IntoEnumIterator},
 };
 
+pub mod ascii;
 pub mod items;
 
 #[derive(Debug)]

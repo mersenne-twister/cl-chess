@@ -45,10 +45,10 @@ impl Board {
                     Some((Piece::new(PieceName::Pawn, Color::Black), false)),
                 ],
                 [None, None, None, None, None, None, None, None],
-                [None, Some((Piece::new(PieceName::Pawn, Color::White), false)), None, None, None, None, None, None],
+                // [None, Some((Piece::new(PieceName::Pawn, Color::White), false)), None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
                 [None, None, None, None, None, None, None, None],
-                // [None, None, None, None, None, None, None, None],
+                [None, None, None, None, None, None, None, None],
                 // [None, None, None, None, None, None, None, None],
                 [
                     Some((Piece::new(PieceName::Pawn, Color::White), false)),

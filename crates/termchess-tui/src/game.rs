@@ -31,22 +31,13 @@ impl Game {
                 // size: Size::Letters {
                 //     different_symbols: false,
                 // },
-                size: Size::UnicodeArt,
+                size: Size::Letters {
+                    different_symbols: false,
+                },
                 ..Default::default()
             },
         }
     }
-
-    // fn board_widget(&self) -> TResult<Paragraph> {
-    //     let mut options = BoardOptions::default();
-    //     options.size = Size::Letters {
-    //         different_symbols: false,
-    //     };
-
-    //     let board = self.board.print(options, &Color::White);
-
-    //     Ok(Paragraph::new(board))
-    // }
 }
 
 #[allow(unused_variables)]

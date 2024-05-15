@@ -21,7 +21,7 @@ pub struct Tile {
 }
 
 impl Tile {
-    pub fn new(board_color: ChessColor, piece: Option<Piece>) -> Self {
+    pub const fn new(board_color: ChessColor, piece: Option<Piece>) -> Self {
         Self { board_color, piece }
     }
 }
@@ -62,24 +62,9 @@ pub enum FrameChar {
 }
 
 impl Frame {
-    fn get_char(&self, ch: FrameChar) -> char {
+    const fn get_char(&self, ch: FrameChar) -> char {
         match *self {
-            Self::Ascii => match ch {
-                FrameChar::TopLeft => '-',
-                FrameChar::TopRight => '-',
-                FrameChar::BotLeft => '-',
-                FrameChar::BotRight => '-',
-                FrameChar::OuterVertical => '|',
-                FrameChar::OuterHoriz => '-',
-                FrameChar::TopIntersection => '-',
-                FrameChar::BotIntersection => '-',
-                FrameChar::LeftIntersection => '|',
-                FrameChar::RightIntersection => '|',
-                FrameChar::InnerVertical => '|',
-                FrameChar::InnerHoriz => '-',
-                FrameChar::InnerIntersection => '|',
-            },
-            Self::Unicode => match ch {
+            Self::Double => match ch {
                 FrameChar::TopLeft => '╔',
                 FrameChar::TopRight => '╗',
                 FrameChar::BotLeft => '╚',
@@ -94,6 +79,7 @@ impl Frame {
                 FrameChar::InnerHoriz => '─',
                 FrameChar::InnerIntersection => '┼',
             },
+            _ => todo!(),
         }
     }
 }
@@ -111,18 +97,27 @@ impl BoardOptions {
         // str.bg(self.theme.get_board(tile))
         self.theme
             .get_piece(tile)
-            .map_or_else(|| Span::from(str.clone()), |c| str.clone().fg(c).bold())
+            // make bold?
+            .map_or_else(|| Span::from(str.clone()), |c| str.clone().fg(c))
             .bg(self.theme.get_board(tile))
     }
 }
 
 impl Size {
+    const fn min_border_width(&self) -> usize {
+        match *self {
+            Self::Letters { .. } | Self::UnicodeSymbols { .. } => 1,
+            Self::UnicodeArt => 3,
+            _ => todo!(),
+        }
+    }
+
     fn get_chars(&self, piece: Option<Piece>) -> Vec<String> {
         let name = piece.map(|v| v.name);
         match self {
             Size::Letters {
                 different_symbols: diff,
-            } => vec![if !diff
+            } => vec![format!(" {} ", if !diff
                 || piece.map(|v| v.color).unwrap_or(ChessColor::White) == ChessColor::White
             {
                 // first one is used normally, latter for black pieces if `diff`
@@ -146,10 +141,10 @@ impl Size {
                     Some(PieceName::King) => "k",
                 }
             }
-            .to_string()],
+            .to_string())],
             Size::UnicodeSymbols {
                 different_symbols: diff,
-            } => vec![if !diff
+            } => vec![format!(" {} ", if !diff
                 || piece.map(|v| v.color).unwrap_or(ChessColor::White) == ChessColor::White
             {
                 // see above arm
@@ -173,18 +168,21 @@ impl Size {
                     Some(PieceName::King) => "♔",
                 }
             }
-            .to_string()],
+            .to_string())],
             Size::UnicodeArt => Vec::from(match name {
                 // see `/chess-pieces` (in root dir) to see pieces
                 None => ["     ", "     ", "     ", "     "],
                 Some(PieceName::Pawn) => ["     ", "  •  ", "  │  ", "  ┴  "],
                 // find one that combines first and second
+                // make shorter
                 Some(PieceName::Knight) => ["  ╥  ", " /╣  ", "  ║  ", "  ╨  "],
                 // make shorter?
-                Some(PieceName::Bishop) => ["  │  ", "  ║  ", "  │  ", "  ┴  "],
+                // Some(PieceName::Bishop) => ["  │  ", "  ║  ", "  │  ", "  ┴  "],
+                Some(PieceName::Bishop) => ["     ", "  │  ", "  ║  ", "  ┴  "],
                 // move top down one?
-                Some(PieceName::Rook) => [" ╘╬╛ ", "  ║  ", "  ║  ", "  ╨  "],
-                // use ☼ instead op •?
+                // Some(PieceName::Rook) => [" ╘╬╛ ", "  ║  ", "  ║  ", "  ╨  "],
+                Some(PieceName::Rook) => ["     ", " ╘╬╛ ", "  ║  ", "  ╨  "],
+                // use ☼ instead of •?
                 Some(PieceName::Queen) => ["• • •", " \\╫/ ", "  ║  ", "  ╨  "],
                 Some(PieceName::King) => ["  +  ", "  ╫  ", "  ║  ", "  ╨  "],
             })
