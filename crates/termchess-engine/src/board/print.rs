@@ -155,8 +155,8 @@ impl Theme {
 impl Default for Theme {
     fn default() -> Self {
         Self {
-            board_white: Color::Indexed(208),
-            board_black: Color::Indexed(216),
+            board_white: Color::Indexed(216),
+            board_black: Color::Indexed(208),
             piece_white: Color::White,
             piece_black: Color::Black,
             frame_fg: Color::default(),
@@ -226,9 +226,7 @@ impl Board {
                 } else {
                     Box::new(0..8usize) as Box<dyn Iterator<Item = _>>
                 } {
-                    // text.push(Line::from(
                     spans.extend_from_slice(
-                        // push spans
                         &options.get_tile(Tile::new(
                             if (((((i % 2) == 0) && ((k % 2usize) == 0usize))
                                 || (((i % 2) != 0) && ((k % 2usize) != 0usize)))
@@ -241,7 +239,6 @@ impl Board {
                             } else {
                                 ChessColor::Black
                             },
-                            // row[k].map(|v| v.0),
                             Option::map(row[k], |v: (Piece, bool)| v.0),
                         ))[j]
                             .clone(),
