@@ -14,11 +14,6 @@ use {
     },
 };
 
-fn board_widget(game: Game, options: BoardOptions) -> Paragraph<'static> {
-    // use unicode characters tempoarily
-    todo!()
-}
-
 impl Game {
     pub fn board_widget(&self) -> TResult<Paragraph> {
         // let mut options = BoardOptions::default();
