@@ -1,11 +1,14 @@
+/// All board *rendering* logic goes in here, all logic concerned with ascii
+/// or colouring goes in `ascii`
+// rustfmt wants to remove this line so just ignore this
 use {
     crate::board::{
         self,
-        ascii::{FrameChar, Tile},
+        ascii::{self, FrameChar, Side, Tile},
         Board, Color as ChessColor, Piece,
     },
-    // super::Game,
     ratatui::{
+        prelude::*,
         style::{Color, Stylize},
         text::{Line, Text},
         widgets::Paragraph,
@@ -116,14 +119,14 @@ pub enum ThemeName {
 
 #[derive(Clone)]
 pub struct Theme {
-    board_white: Color,
-    board_black: Color,
-    piece_white: Color,
-    piece_black: Color,
-    frame_fg: Color,
-    frame_bg: Color,
-    axis_fg: Color,
-    axis_bg: Color,
+    pub board_white: Color,
+    pub board_black: Color,
+    pub piece_white: Color,
+    pub piece_black: Color,
+    pub border_fg: Color,
+    pub border_bg: Color,
+    pub axis_fg: Color,
+    pub axis_bg: Color,
 }
 
 impl Theme {
@@ -159,8 +162,8 @@ impl Default for Theme {
             board_black: Color::Indexed(208),
             piece_white: Color::White,
             piece_black: Color::Black,
-            frame_fg: Color::default(),
-            frame_bg: Color::default(),
+            border_fg: Color::Indexed(215),
+            border_bg: Color::Indexed(52),
             axis_fg: Color::default(),
             axis_bg: Color::default(),
         }
@@ -170,17 +173,32 @@ impl Default for Theme {
 #[derive(Default, Clone)]
 pub struct BoardOptions {
     pub size: Size,
-    pub frame: Option<Frame>,
-    /// a physical separation between squares so one can play without colour
-    pub compat_frame: bool,
+    // do I want to make this changeable, or should it be constant?
+    // pub frame: Option<Frame>,
+    /// a physical separation between squares so one can play without colour,
+    /// and other compatibility
+    pub compat: bool,
     pub axis: Axis,
     pub theme: Theme,
 }
 
 impl BoardOptions {
     /// return width|height of board
-    pub fn breadth(&self) -> usize {
-        todo!()
+    pub fn width(&self) -> usize {
+        // get width of one of the strings
+        let tile_width = self.size.get_chars(None)[0].len();
+
+        // TODO: account for axis
+
+        // TODO: remove magic number
+        tile_width * 8 + 6
+    }
+
+    pub fn height(&self) -> usize {
+        // get number of strings
+        let tile_height = self.size.get_chars(None).len();
+
+        tile_height * 8 + 2
     }
 
     ///  return the lines in one tile
@@ -205,9 +223,9 @@ impl BoardOptions {
 // highlight: Option<Position>
 impl Board {
     pub fn print<'a>(&self, options: &'a BoardOptions, rotation: ChessColor) -> Text<'a> {
-        assert!(options.frame.is_none());
-
         let mut text = Vec::new();
+
+        text.push(Line::from(options.get_frame(Side::Top)));
 
         // casting to a trait object is required because both possible values
         // must have the same type
@@ -221,6 +239,9 @@ impl Board {
             for j in 0..options.tile_lines() {
                 // make vec of spans
                 let mut spans = Vec::new();
+
+                spans.push(options.vert_frame_char());
+
                 for k in if ChessColor::Black == rotation {
                     Box::new((0..8usize).rev()) as Box<dyn Iterator<Item = _>>
                 } else {
@@ -244,10 +265,15 @@ impl Board {
                             .clone(),
                     );
                 }
+
+                spans.push(options.vert_frame_char());
+
                 // push line from vec of spans
                 text.push(Line::from(spans));
             }
         }
+
+        text.push(Line::from(options.get_frame(Side::Bottom)));
 
         Text::from(text)
     }

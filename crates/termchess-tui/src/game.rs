@@ -28,12 +28,10 @@ impl Game {
             mouse_pos: Position::default(),
             terminal,
             board_options: BoardOptions {
-                // size: Size::Letters {
-                //     different_symbols: false,
-                // },
                 size: Size::Letters {
                     different_symbols: false,
                 },
+                // size: Size::UnicodeArt,
                 ..Default::default()
             },
         }

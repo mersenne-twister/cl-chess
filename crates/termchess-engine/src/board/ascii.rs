@@ -101,6 +101,32 @@ impl BoardOptions {
             .map_or_else(|| Span::from(str.clone()), |c| str.clone().fg(c))
             .bg(self.theme.get_board(tile))
     }
+
+    pub fn get_frame(&self, side: Side) -> Span {
+        let (start, mid, end) = match side {
+            Side::Top => ("╔", "═", "╗"),
+            Side::Bottom => ("╚", "═", "╝"),
+        };
+
+        format!(" {}{}{} ", start, mid.repeat(self.width() - 4), end)
+            .fg(self.theme.border_fg)
+            .bg(self.theme.border_bg)
+    }
+
+    pub fn get_axis(&self, side: Side) -> Span {
+        todo!()
+    }
+
+    pub fn vert_frame_char(&self) -> Span {
+        " ║ ".fg(self.theme.border_fg).bg(self.theme.border_bg)
+    }
+}
+
+// TODO: put in common
+// TODO: figure out how I even want to approach this
+pub enum Side {
+    Top,
+    Bottom,
 }
 
 impl Size {
@@ -112,7 +138,7 @@ impl Size {
         }
     }
 
-    fn get_chars(&self, piece: Option<Piece>) -> Vec<String> {
+    pub fn get_chars(&self, piece: Option<Piece>) -> Vec<String> {
         let name = piece.map(|v| v.name);
         match self {
             Size::Letters {
