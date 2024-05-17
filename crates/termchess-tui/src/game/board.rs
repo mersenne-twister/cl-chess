@@ -18,7 +18,9 @@ impl Game {
     pub fn board_widget(&self) -> TResult<Paragraph> {
         // calc if one should be highlighted
 
-        let board = self.board.print(&self.board_options, ChessColor::White);
+        let board = self
+            .board
+            .print(&self.board_options, ChessColor::White, None);
 
         Ok(Paragraph::new(board))
     }

@@ -85,20 +85,30 @@ impl Frame {
 }
 
 impl BoardOptions {
-    pub fn get_tile(&self, tile: Tile) -> Vec<Vec<Span<'_>>> {
+    pub fn get_tile(&self, tile: Tile, bold: bool) -> Vec<Span<'_>> {
         self.size
             .get_chars(tile.piece)
             .iter()
-            .map(|str| vec![self.set_colors((*str).clone(), tile)])
+            .map(|str| self.set_colors((*str).clone(), tile, bold))
             .collect()
     }
 
-    fn set_colors(&self, str: String, tile: Tile) -> Span<'_> {
+    fn set_colors(&self, str: String, tile: Tile, bold: bool) -> Span<'_> {
         // str.bg(self.theme.get_board(tile))
         self.theme
             .get_piece(tile)
             // make bold?
-            .map_or_else(|| Span::from(str.clone()), |c| str.clone().fg(c))
+            // check if borrow checker issues removing second clone
+            .map_or_else(
+                || Span::from(str.clone()),
+                |c| {
+                    if bold {
+                        str.clone().bold().fg(c)
+                    } else {
+                        str.clone().fg(c)
+                    }
+                },
+            )
             .bg(self.theme.get_board(tile))
     }
 
@@ -299,7 +309,7 @@ impl Size {
                 Some(PieceName::King) => ["  +  ", "  ╫  ", "  ║  ", "  ╨  "],
             })
             .iter()
-            .map(|str| format!("  {}  ", str))
+            .map(|str| format!("   {}   ", str))
             .collect(),
             // probably make this one with blocks
             Size::BlockArt => Vec::from(match name {
@@ -354,7 +364,7 @@ impl Size {
                 ],
             })
             .iter()
-            .map(|str| format!(" {} ", str))
+            .map(|str| format!("  {}  ", str))
             .collect(),
             // some large one, haven't decided the style
             // can always add more anyways, not that hard

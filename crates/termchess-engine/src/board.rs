@@ -655,6 +655,10 @@ impl Display for Side {
     }
 }
 
+// TODO! refactor this to hold arr indices,
+// and use with arr_index, board_index, from_arr_indices, from_board_indices,
+// and so on
+// some of those are for the board but whatever
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Position {
     letter: char,

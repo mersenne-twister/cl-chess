@@ -222,7 +222,8 @@ impl Board {
         &self,
         options: &'a BoardOptions,
         rotation: ChessColor,
-        highlight: Option<Position>,
+        // TODO: use `Position`
+        highlight: Option<(u8, u8)>,
     ) -> Text<'a> {
         // ENSURE THAT POSITION WORKS AS EXPECTED
 
@@ -254,21 +255,27 @@ impl Board {
                 } else {
                     Box::new(0..8usize) as Box<dyn Iterator<Item = _>>
                 } {
-                    spans.extend_from_slice(
-                        &options.get_tile(Tile::new(
-                            if (((((i % 2) == 0) && ((k % 2usize) == 0usize))
-                                || (((i % 2) != 0) && ((k % 2usize) != 0usize)))
-                                && rotation == ChessColor::White)
-                                || (((((i % 2) == 0) && ((k % 2usize) != 0usize))
-                                    || (((i % 2) != 0) && ((k % 2usize) == 0usize)))
-                                    && rotation == ChessColor::Black)
-                            {
-                                ChessColor::White
-                            } else {
-                                ChessColor::Black
-                            },
-                            Option::map(row[k], |v: (Piece, bool)| v.0),
-                        ))[j]
+                    spans.push(
+                        options.get_tile(
+                            Tile::new(
+                                if (((((i % 2) == 0) && ((k % 2usize) == 0usize))
+                                    || (((i % 2) != 0) && ((k % 2usize) != 0usize)))
+                                    && rotation == ChessColor::White)
+                                    || (((((i % 2) == 0) && ((k % 2usize) != 0usize))
+                                        || (((i % 2) != 0) && ((k % 2usize) == 0usize)))
+                                        && rotation == ChessColor::Black)
+                                {
+                                    ChessColor::White
+                                } else {
+                                    ChessColor::Black
+                                },
+                                Option::map(row[k], |v: (Piece, bool)| v.0),
+                            ),
+                            highlight.map_or_else(
+                                || false,
+                                |v| (v.1 as usize == i) && (v.0 as usize == k),
+                            ),
+                        )[j]
                             .clone(),
                     );
                 }
