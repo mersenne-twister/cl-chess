@@ -102,31 +102,116 @@ impl BoardOptions {
             .bg(self.theme.get_board(tile))
     }
 
-    pub fn get_frame(&self, side: Side) -> Span {
-        let (start, mid, end) = match side {
-            Side::Top => ("╔", "═", "╗"),
-            Side::Bottom => ("╚", "═", "╝"),
-        };
-
-        format!(" {}{}{} ", start, mid.repeat(self.width() - 4), end)
-            .fg(self.theme.border_fg)
-            .bg(self.theme.border_bg)
+    // TODO: use this everywhere
+    fn set_border_colors(&self, str: String, tile: Tile) -> Span<'_> {
+        todo!()
     }
 
-    pub fn get_axis(&self, side: Side) -> Span {
-        todo!()
+    pub fn get_frame(&self, side: VertSide) -> Span {
+        let (start, mid, end) = match side {
+            VertSide::Top => ("╔", "═", "╗"),
+            VertSide::Bottom => ("╚", "═", "╝"),
+        };
+
+        let left = self.border_width(HorizSide::Left);
+        let right = self.border_width(HorizSide::Right);
+
+        format!(
+            "{}{}{}{}{}",
+            " ".repeat(left - 2),
+            start,
+            // 2 spaces on either side of board
+            mid.repeat(self.width() - (left + right - 2)),
+            end,
+            " ".repeat(right - 2),
+        )
+        .fg(self.theme.border_fg)
+        .bg(self.theme.border_bg)
+    }
+
+    pub fn get_axis(&self, side: VertSide) -> Span {
+        // these must be an odd number of characters in a tile
+        let spaces = " ".repeat((self.tile_width() - 1) / 2);
+
+        let mut tiles = String::new();
+        for i in 0..8 {
+            // 65 == 'A', ...
+            tiles.push_str(
+                format!(
+                    "{}{}{}",
+                    spaces,
+                    char::from_u32(i + 65).expect("should be valid"),
+                    spaces,
+                )
+                .as_ref(),
+            );
+        }
+
+        format!(
+            "{}{}{}",
+            " ".repeat(self.border_width(HorizSide::Left)),
+            tiles,
+            " ".repeat(self.border_width(HorizSide::Left)),
+        )
+        .fg(self.theme.border_fg)
+        .bg(self.theme.border_bg)
     }
 
     pub fn vert_frame_char(&self) -> Span {
         " ║ ".fg(self.theme.border_fg).bg(self.theme.border_bg)
     }
+
+    pub fn vert_axis_char(&self, rank: usize, row: usize, side: HorizSide) -> Span {
+        if (((side == HorizSide::Left) && self.axis.left)
+            || ((side == HorizSide::Right) && self.axis.right))
+            && true
+        {
+            // TODO: add more spaces so the board is squarer
+            let space = " ".to_owned();
+            // TODO: make test that ensures all have even, other than that one,
+            // and similar invariants, like even chars for menu items,
+            // and all sprites having the same number of chars
+            let rank = if
+            // if it's one, just print it no matter what
+            (self.tile_height() == 1)
+            // tile_height is odd, so we can do it the right way
+            || (((self.tile_height() % 2) != 0)
+                && (row == (self.tile_height().div_ceil(2))))
+                //tile_height is 4, so we use our special case
+                || ((self.tile_height() == 4)
+                    && (((rank <= 3) && (row == 1)) || ((rank >= 4) && (row == 2))))
+            {
+                (rank as i8 - 8).abs().to_string()
+            } else {
+                " ".to_owned()
+            };
+
+            let (first, second) = if side == HorizSide::Left {
+                (space, rank)
+            } else {
+                (rank, space)
+            };
+            format!("{}{}", first, second)
+        } else {
+            " ".to_owned()
+        }
+        .fg(self.theme.border_fg)
+        .bg(self.theme.border_bg)
+    }
 }
 
-// TODO: put in common
-// TODO: figure out how I even want to approach this
-pub enum Side {
+// are two really necessary? how can I refactor this without introducing
+// ambiguity?
+#[derive(PartialEq, Eq)]
+pub enum VertSide {
     Top,
     Bottom,
+}
+
+#[derive(PartialEq, Eq)]
+pub enum HorizSide {
+    Left,
+    Right,
 }
 
 impl Size {
@@ -201,7 +286,8 @@ impl Size {
                 Some(PieceName::Pawn) => ["     ", "  •  ", "  │  ", "  ┴  "],
                 // find one that combines first and second
                 // make shorter
-                Some(PieceName::Knight) => ["  ╥  ", " /╣  ", "  ║  ", "  ╨  "],
+                // Some(PieceName::Knight) => ["  ╥  ", " /╣  ", "  ║  ", "  ╨  "],
+                Some(PieceName::Knight) => ["  _  ", " ╱╣  ", "  ║  ", "  ╨  "],
                 // make shorter?
                 // Some(PieceName::Bishop) => ["  │  ", "  ║  ", "  │  ", "  ┴  "],
                 Some(PieceName::Bishop) => ["     ", "  │  ", "  ║  ", "  ┴  "],
@@ -209,14 +295,67 @@ impl Size {
                 // Some(PieceName::Rook) => [" ╘╬╛ ", "  ║  ", "  ║  ", "  ╨  "],
                 Some(PieceName::Rook) => ["     ", " ╘╬╛ ", "  ║  ", "  ╨  "],
                 // use ☼ instead of •?
-                Some(PieceName::Queen) => ["• • •", " \\╫/ ", "  ║  ", "  ╨  "],
+                Some(PieceName::Queen) => ["• • •", " ╲╫╱ ", "  ║  ", "  ╨  "],
                 Some(PieceName::King) => ["  +  ", "  ╫  ", "  ║  ", "  ╨  "],
             })
             .iter()
             .map(|str| format!("  {}  ", str))
             .collect(),
             // probably make this one with blocks
-            Size::BlockArt => todo!(),
+            Size::BlockArt => Vec::from(match name {
+                None => [
+                    "         ",
+                    "         ",
+                    "         ",
+                    "         ",
+                    "         ",
+                ],
+                Some(PieceName::Pawn) => [
+                    "         ",
+                    "    █    ",
+                    "   ███   ",
+                    "    █    ",
+                    "   ███   ",
+                ],
+                Some(PieceName::Knight) => [
+                    "    ██   ",
+                    "  █████  ",
+                    " ██ ████ ",
+                    "   ████  ",
+                    "  █████  ",
+                ],
+                Some(PieceName::Bishop) => [
+                    "    █    ",
+                    "   ███   ",
+                    "   ███   ",
+                    "    █    ",
+                    "  █████  ",
+                ],
+                Some(PieceName::Rook) => [
+                    "  █ █ █  ",
+                    "  █████  ",
+                    "   ███   ",
+                    "   ███   ",
+                    "  █████  ",
+                ],
+                Some(PieceName::Queen) => [
+                    " █  █  █ ",
+                    "  █ █ █  ",
+                    "   ███   ",
+                    "   ███   ",
+                    "  █████  ",
+                ],
+                Some(PieceName::King) => [
+                    "    █    ",
+                    " ██ █ ██ ",
+                    "█  █ █  █",
+                    " █  █  █ ",
+                    "  █████  ",
+                ],
+            })
+            .iter()
+            .map(|str| format!(" {} ", str))
+            .collect(),
             // some large one, haven't decided the style
             // can always add more anyways, not that hard
             Size::TbdLarge => todo!(),

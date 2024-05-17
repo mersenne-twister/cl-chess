@@ -177,6 +177,7 @@ impl Screen for Menu {
 
     fn handle_mouse(&mut self, mouse: event::MouseEvent) -> TResult<()> {
         self.mouse_pos = Position::new(mouse.column, mouse.row);
+
         if mouse.kind == MouseEventKind::Down(MouseButton::Left) {
             if let Some(item) = self.mouse_over_item() {
                 item.handle(self)?;

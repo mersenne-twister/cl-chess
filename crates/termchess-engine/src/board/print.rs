@@ -4,8 +4,8 @@
 use {
     crate::board::{
         self,
-        ascii::{self, FrameChar, Side, Tile},
-        Board, Color as ChessColor, Piece,
+        ascii::{self, FrameChar, HorizSide, Tile, VertSide},
+        Board, Color as ChessColor, Piece, Position,
     },
     ratatui::{
         prelude::*,
@@ -51,41 +51,15 @@ pub enum Thickness {
 
 #[derive(Clone, Copy)]
 pub struct Axis {
-    top: bool,
-    bottom: bool,
-    left: bool,
-    right: bool,
+    pub top: bool,
+    pub bottom: bool,
+    pub left: bool,
+    pub right: bool,
 }
 
 impl Axis {
-    fn new_all() -> Self {
-        Self {
-            top: true,
-            bottom: true,
-            left: true,
-            right: true,
-        }
-    }
-
-    fn new_none() -> Self {
-        Self {
-            top: false,
-            bottom: false,
-            left: false,
-            right: false,
-        }
-    }
-
-    fn new_left_bottom() -> Self {
-        Self {
-            top: false,
-            bottom: true,
-            left: true,
-            right: false,
-        }
-    }
-
-    // are the other ones necessary?
+    // settings options:
+    // all, none, bottom & left ("normal", and the default one)
     fn new(top: bool, bottom: bool, left: bool, right: bool) -> Self {
         Self {
             top,
@@ -98,7 +72,7 @@ impl Axis {
 
 impl Default for Axis {
     fn default() -> Self {
-        Self::new_left_bottom()
+        Self::new(true, true, true, true)
     }
 }
 
@@ -183,22 +157,44 @@ pub struct BoardOptions {
 }
 
 impl BoardOptions {
-    /// return width|height of board
+    pub fn border_width(&self, side: HorizSide) -> usize {
+        3 + if side == HorizSide::Left {
+            // 1 * 2 if true, 0 * 2 if false
+            usize::from(self.axis.left) * 2
+        } else {
+            usize::from(self.axis.right) * 2
+        }
+    }
+
+    /// get width of one of the strings
+    pub fn tile_width(&self) -> usize {
+        self.size.get_chars(None)[0].len()
+    }
+
     pub fn width(&self) -> usize {
-        // get width of one of the strings
-        let tile_width = self.size.get_chars(None)[0].len();
+        self.tile_width() * 8
+            + self.border_width(HorizSide::Left)
+            + self.border_width(HorizSide::Right)
+    }
 
-        // TODO: account for axis
+    pub fn border_height(&self, side: VertSide) -> usize {
+        // 1 + usize::from(self.axis.top) + usize::from(self.axis.bottom)
+        1 + if side == VertSide::Top {
+            usize::from(self.axis.top)
+        } else {
+            usize::from(self.axis.bottom)
+        }
+    }
 
-        // TODO: remove magic number
-        tile_width * 8 + 6
+    /// get number of strings
+    pub fn tile_height(&self) -> usize {
+        self.size.get_chars(None).len()
     }
 
     pub fn height(&self) -> usize {
-        // get number of strings
-        let tile_height = self.size.get_chars(None).len();
-
-        tile_height * 8 + 2
+        self.tile_height() * 8
+            + self.border_height(VertSide::Top)
+            + self.border_height(VertSide::Bottom)
     }
 
     ///  return the lines in one tile
@@ -222,10 +218,20 @@ impl BoardOptions {
 
 // highlight: Option<Position>
 impl Board {
-    pub fn print<'a>(&self, options: &'a BoardOptions, rotation: ChessColor) -> Text<'a> {
+    pub fn print<'a>(
+        &self,
+        options: &'a BoardOptions,
+        rotation: ChessColor,
+        highlight: Option<Position>,
+    ) -> Text<'a> {
+        // ENSURE THAT POSITION WORKS AS EXPECTED
+
         let mut text = Vec::new();
 
-        text.push(Line::from(options.get_frame(Side::Top)));
+        if options.axis.top {
+            text.push(Line::from(options.get_axis(VertSide::Top)));
+        }
+        text.push(Line::from(options.get_frame(VertSide::Top)));
 
         // casting to a trait object is required because both possible values
         // must have the same type
@@ -240,6 +246,7 @@ impl Board {
                 // make vec of spans
                 let mut spans = Vec::new();
 
+                spans.push(options.vert_axis_char(i, j, HorizSide::Left));
                 spans.push(options.vert_frame_char());
 
                 for k in if ChessColor::Black == rotation {
@@ -267,13 +274,17 @@ impl Board {
                 }
 
                 spans.push(options.vert_frame_char());
+                spans.push(options.vert_axis_char(i, j, HorizSide::Right));
 
                 // push line from vec of spans
                 text.push(Line::from(spans));
             }
         }
 
-        text.push(Line::from(options.get_frame(Side::Bottom)));
+        if options.axis.bottom {
+            text.push(Line::from(options.get_frame(VertSide::Bottom)));
+        }
+        text.push(Line::from(options.get_axis(VertSide::Bottom)));
 
         Text::from(text)
     }

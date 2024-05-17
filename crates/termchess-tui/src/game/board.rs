@@ -16,10 +16,7 @@ use {
 
 impl Game {
     pub fn board_widget(&self) -> TResult<Paragraph> {
-        // let mut options = BoardOptions::default();
-        // options.size = Size::Letters {
-        //     different_symbols: false,
-        // };
+        // calc if one should be highlighted
 
         let board = self.board.print(&self.board_options, ChessColor::White);
 
