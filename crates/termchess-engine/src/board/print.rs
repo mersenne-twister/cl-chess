@@ -96,7 +96,9 @@ pub struct Theme {
     pub board_white: Color,
     pub board_black: Color,
     pub piece_white: Color,
+    pub piece_white_highlight: Color,
     pub piece_black: Color,
+    pub piece_black_highlight: Color,
     pub border_fg: Color,
     pub border_bg: Color,
     pub axis_fg: Color,
@@ -118,13 +120,12 @@ impl Theme {
         }
     }
 
-    pub fn get_piece(&self, tile: Tile) -> Option<Color> {
-        tile.piece.map(|v| {
-            if v.color == ChessColor::White {
-                self.piece_white
-            } else {
-                self.piece_black
-            }
+    pub fn get_piece(&self, tile: Tile, highlight: bool) -> Option<Color> {
+        tile.piece.map(|v| match (v.color, highlight) {
+            (ChessColor::White, false) => self.piece_white,
+            (ChessColor::White, true) => self.piece_white_highlight,
+            (ChessColor::Black, false) => self.piece_black,
+            (ChessColor::Black, true) => self.piece_black_highlight,
         })
     }
 }
@@ -135,7 +136,11 @@ impl Default for Theme {
             board_white: Color::Indexed(216),
             board_black: Color::Indexed(208),
             piece_white: Color::White,
+            piece_white_highlight: Color::Indexed(250),
+            // piece_white_highlight: Color::Red,
             piece_black: Color::Black,
+            piece_black_highlight: Color::Indexed(240),
+            // piece_black_highlight: Color::Red,
             border_fg: Color::Indexed(215),
             border_bg: Color::Indexed(52),
             axis_fg: Color::default(),
@@ -223,7 +228,7 @@ impl Board {
         options: &'a BoardOptions,
         rotation: ChessColor,
         // TODO: use `Position`
-        highlight: Option<(u8, u8)>,
+        highlight: Option<(usize, usize)>,
     ) -> Text<'a> {
         // ENSURE THAT POSITION WORKS AS EXPECTED
 

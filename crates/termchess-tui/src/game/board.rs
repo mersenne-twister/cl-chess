@@ -1,5 +1,7 @@
 use {
     super::Game,
+    divrem::DivFloor,
+    log::{debug, info},
     // ascii::Tile,
     ratatui::{
         style::{Color, Stylize},
@@ -9,6 +11,7 @@ use {
     termchess_common::TResult,
     termchess_engine::board::{
         self,
+        ascii::{HorizSide, VertSide},
         print::{BoardOptions, Size},
         Board, Color as ChessColor, Piece,
     },
@@ -16,11 +19,43 @@ use {
 
 impl Game {
     pub fn board_widget(&self) -> TResult<Paragraph> {
-        // calc if one should be highlighted
+        // `/` does floor division for ints
+        #[allow(unstable_name_collisions)]
+        let pos = (
+            ((self.mouse_pos.x as isize
+                - self.board_pos.x as isize
+                - self.board_options.border_width(HorizSide::Left) as isize)
+                .div_floor(self.board_options.tile_width() as isize)),
+            (self.mouse_pos.y as isize
+                - self.board_pos.y as isize
+                - self.board_options.border_height(VertSide::Top) as isize)
+                .div_floor(self.board_options.tile_height() as isize),
+        );
 
-        let board = self
-            .board
-            .print(&self.board_options, ChessColor::White, None);
+        // debug!("mouse_pos: {:?}", self.mouse_pos);
+        // debug!("board_pos: {:?}", self.board_pos);
+        // debug!("pos: {:?}", pos);
+        // debug!("tile_width: {:?}", self.board_options.tile_width());
+        // debug!("tile_height: {:?}", self.board_options.tile_height());
+        // debug!(
+        //     "border_width: {:?}",
+        //     self.board_options.border_width(HorizSide::Left)
+        // );
+        // debug!(
+        //     "border_height: {:?}",
+        //     self.board_options.border_height(VertSide::Top)
+        // );
+
+        let board = self.board.print(
+            &self.board_options,
+            ChessColor::White,
+            if (pos.0 >= 0) && (pos.0 <= 7) && (pos.1 >= 0) && (pos.1 <= 7) {
+                Some((pos.0 as usize, pos.1 as usize))
+            } else {
+                None
+            },
+            // Some((0, 7)),
+        );
 
         Ok(Paragraph::new(board))
     }

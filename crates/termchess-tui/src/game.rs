@@ -33,15 +33,15 @@ impl Game {
                 // size: Size::Letters {
                 //     different_symbols: false,
                 // },
-                size: Size::UnicodeArt,
-                // size: Size::BlockArt,
+                // size: Size::UnicodeArt,
+                size: Size::BlockArt,
                 ..Default::default()
             },
         }
     }
 }
 
-#[allow(unused_variables)]
+// #[allow(unused_variables)] // I forget why
 impl Screen for Game {
     fn render_frame(&mut self, frame: &mut Frame) -> TResult<()> {
         let layout = Layout::default()
@@ -56,11 +56,12 @@ impl Screen for Game {
         let board_layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Fill(1),
+                Constraint::Fill(3),
                 Constraint::Length(self.board_options.height() as u16),
                 Constraint::Fill(1),
             ])
             .split(layout[1]);
+        self.board_pos = board_layout[1].as_position();
 
         frame.render_widget(self.board_widget()?, board_layout[1]);
 
@@ -87,7 +88,6 @@ impl Screen for Game {
         // then separate functions for clicks?
         self.mouse_pos = Position::new(mouse.column, mouse.row);
 
-        // TODO
         Ok(())
     }
 

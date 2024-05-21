@@ -108,6 +108,9 @@ trait Screen {
         Ok(())
     }
 
+    // run trait, implemented for all screen, which requires render, and handle
+    // what does separate implementation get me?
+
     /// function to handle rendering
     /// reccomended to use only for layout, and use getter functions for the widgets
     fn render_frame(&mut self, frame: &mut Frame) -> TResult<()>;

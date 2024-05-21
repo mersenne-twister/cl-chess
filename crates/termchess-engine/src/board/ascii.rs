@@ -85,30 +85,21 @@ impl Frame {
 }
 
 impl BoardOptions {
-    pub fn get_tile(&self, tile: Tile, bold: bool) -> Vec<Span<'_>> {
+    pub fn get_tile(&self, tile: Tile, highlight: bool) -> Vec<Span<'_>> {
         self.size
             .get_chars(tile.piece)
             .iter()
-            .map(|str| self.set_colors((*str).clone(), tile, bold))
+            .map(|str| self.set_colors((*str).clone(), tile, highlight))
             .collect()
     }
 
-    fn set_colors(&self, str: String, tile: Tile, bold: bool) -> Span<'_> {
+    fn set_colors(&self, str: String, tile: Tile, highlight: bool) -> Span<'_> {
         // str.bg(self.theme.get_board(tile))
         self.theme
-            .get_piece(tile)
+            .get_piece(tile, highlight)
             // make bold?
             // check if borrow checker issues removing second clone
-            .map_or_else(
-                || Span::from(str.clone()),
-                |c| {
-                    if bold {
-                        str.clone().bold().fg(c)
-                    } else {
-                        str.clone().fg(c)
-                    }
-                },
-            )
+            .map_or_else(|| Span::from(str.clone()), |c| str.clone().fg(c))
             .bg(self.theme.get_board(tile))
     }
 

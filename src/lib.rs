@@ -1,6 +1,12 @@
 use {
     crate::board::Position,
     board::{Board, PieceColor},
+    log::{debug, info, LevelFilter},
+    log4rs::{
+        append::file::FileAppender,
+        config::{Appender, Config, Root},
+        encode::pattern::PatternEncoder,
+    },
     std::{
         error::Error,
         io::{self, Write},
@@ -15,6 +21,23 @@ pub mod parse;
 pub mod text;
 
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
+    let logfile = FileAppender::builder()
+        .encoder(Box::new(PatternEncoder::new("{d} {l}: {m}\n")))
+        .build("log/termchess.log")?;
+
+    let config = Config::builder()
+        .appender(Appender::builder().build("logfile", Box::new(logfile)))
+        .build(Root::builder().appender("logfile").build(
+            #[cfg(not(debug_assertions))]
+            LevelFilter::Info,
+            #[cfg(debug_assertions)]
+            LevelFilter::Debug,
+        ))?;
+
+    log4rs::init_config(config)?;
+    info!("logging initialized");
+    info!("termchess execution begun");
+
     termchess_tui::run(args)
     // run_cli(args)
     // todo!()

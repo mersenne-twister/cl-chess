@@ -139,6 +139,8 @@ impl Screen for Menu {
 
         self.items_pos = items_layout[1].as_position();
 
+        // TODO: add `background_color() -> Option<Colour>` to trait
+        frame.render_widget(Text::default().bg(Color::Indexed(232)), frame.size()); //background
         frame.render_widget(art_widget(), canvas_layout[1]);
         frame.render_widget(self.items_widget(), items_layout[1]);
 

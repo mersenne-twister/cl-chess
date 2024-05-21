@@ -9,5 +9,6 @@ description = "The underlying representation of the termchess chess implementati
 [dependencies]
 crossterm = "0.27.0"
 lazy_static = "1.4.0"
+log = "0.4.21"
 ratatui = "0.26.2"
 termchess-common = { path = "../termchess-common" }

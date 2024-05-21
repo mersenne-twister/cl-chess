@@ -14,3 +14,5 @@ ratatui = { version = "0.26.2" }
 strum = { version = "0.26.2", features = ["strum_macros", "derive"] }
 strum_macros = "0.26.2"
 lazy_static = "1.4.0"
+log = "0.4.21"
+divrem = "1.0.0"
