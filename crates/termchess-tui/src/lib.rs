@@ -72,8 +72,13 @@ fn terminal_normal_mode() -> TResult<()> {
     Ok(())
 }
 
-// if a return is needed for any of these, make them generic over TResult<T>
-trait Screen {
+trait Run: Screen {
+    fn run(self) -> TResult<()>
+    where
+        Self: Sized;
+}
+
+impl<T: Screen> Run for T {
     fn run(mut self) -> TResult<()>
     where
         Self: Sized,
@@ -107,6 +112,43 @@ trait Screen {
 
         Ok(())
     }
+}
+
+// if a return is needed for any of these, make them generic over TResult<T>
+trait Screen {
+    // fn run(mut self) -> TResult<()>
+    // where
+    //     Self: Sized,
+    // {
+    //     let mut last = Instant::now();
+    //     while !self.exit() {
+    //         if Instant::now() >= last + Duration::from_secs(1 / 60) {
+    //             last = Instant::now();
+
+    //             // let terminal = self.terminal();
+    //             // terminal.draw(|frame| self.render_frame(frame))?;
+    //             Rc::clone(self.terminal())
+    //                 .borrow_mut()
+    //                 .draw(|frame| self.render_frame(frame).unwrap())?;
+    //         }
+
+    //         if event::poll(Duration::from_secs(1 / 60))? {
+    //             let event = event::read()?;
+    //             if let Event::Key(event) = event {
+    //                 // stops duplicate events on windows
+    //                 if event.kind == KeyEventKind::Press {
+    //                     self.handle_key(event)?;
+    //                 }
+    //             } else if let Event::Mouse(event) = event {
+    //                 self.handle_mouse(event)?;
+    //             } else {
+    //                 self.handle_misc(event)?;
+    //             }
+    //         }
+    //     }
+
+    //     Ok(())
+    // }
 
     // run trait, implemented for all screen, which requires render, and handle
     // what does separate implementation get me?

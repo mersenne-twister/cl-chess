@@ -1,6 +1,6 @@
 use {
     super::Menu,
-    crate::{game::Game, Screen},
+    crate::{game::Game, Run},
     std::fmt::Display,
     strum_macros::{EnumCount as EnumCountMacro, EnumIter, FromRepr},
     termchess_common::TResult,
