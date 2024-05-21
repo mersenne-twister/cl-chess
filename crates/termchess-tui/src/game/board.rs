@@ -32,20 +32,6 @@ impl Game {
                 .div_floor(self.board_options.tile_height() as isize),
         );
 
-        // debug!("mouse_pos: {:?}", self.mouse_pos);
-        // debug!("board_pos: {:?}", self.board_pos);
-        // debug!("pos: {:?}", pos);
-        // debug!("tile_width: {:?}", self.board_options.tile_width());
-        // debug!("tile_height: {:?}", self.board_options.tile_height());
-        // debug!(
-        //     "border_width: {:?}",
-        //     self.board_options.border_width(HorizSide::Left)
-        // );
-        // debug!(
-        //     "border_height: {:?}",
-        //     self.board_options.border_height(VertSide::Top)
-        // );
-
         let board = self.board.print(
             &self.board_options,
             ChessColor::White,
