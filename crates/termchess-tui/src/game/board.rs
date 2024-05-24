@@ -13,7 +13,7 @@ use {
         self,
         ascii::{HorizSide, VertSide},
         print::{BoardOptions, Size},
-        Board, Color as ChessColor, Piece,
+        Board, Co as ChessColor, Piece,
     },
 };
 

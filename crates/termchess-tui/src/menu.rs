@@ -1,6 +1,6 @@
 use {
     super::{Screen, Terminal},
-    crate::TResult,
+    crate::{Handle, Render, TResult},
     crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEventKind},
     items::Item,
     ratatui::{
@@ -107,6 +107,20 @@ impl Menu {
 }
 
 impl Screen for Menu {
+    fn terminal(&self) -> &Rc<RefCell<Terminal>> {
+        &self.terminal
+    }
+
+    fn mouse_pos(&mut self) -> &mut Position {
+        &mut self.mouse_pos
+    }
+
+    fn exit(&self) -> bool {
+        self.exit
+    }
+}
+
+impl Render for Menu {
     fn render_frame(&mut self, frame: &mut Frame) -> TResult<()> {
         let layout = Layout::default()
             .direction(Direction::Vertical)
@@ -140,13 +154,19 @@ impl Screen for Menu {
         self.items_pos = items_layout[1].as_position();
 
         // TODO: add `background_color() -> Option<Colour>` to trait
-        frame.render_widget(Text::default().bg(Color::Indexed(232)), frame.size()); //background
+        // frame.render_widget(Text::default().bg(self.background_color()), frame.size()); //background
         frame.render_widget(art_widget(), canvas_layout[1]);
         frame.render_widget(self.items_widget(), items_layout[1]);
 
         Ok(())
     }
 
+    fn background_color(&self) -> Color {
+        Color::Indexed(232)
+    }
+}
+
+impl Handle for Menu {
     fn handle_key(&mut self, key: KeyEvent) -> TResult<()> {
         if key.modifiers == KeyModifiers::NONE {
             match key.code {
@@ -178,8 +198,6 @@ impl Screen for Menu {
     }
 
     fn handle_mouse(&mut self, mouse: event::MouseEvent) -> TResult<()> {
-        self.mouse_pos = Position::new(mouse.column, mouse.row);
-
         if mouse.kind == MouseEventKind::Down(MouseButton::Left) {
             if let Some(item) = self.mouse_over_item() {
                 item.handle(self)?;
@@ -194,14 +212,6 @@ impl Screen for Menu {
         // nothing to do here (for now)
 
         Ok(())
-    }
-
-    fn terminal(&self) -> &Rc<RefCell<Terminal>> {
-        &self.terminal
-    }
-
-    fn exit(&self) -> bool {
-        self.exit
     }
 }
 

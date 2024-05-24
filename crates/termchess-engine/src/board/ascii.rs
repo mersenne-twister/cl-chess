@@ -2,7 +2,7 @@ use {
     // super::{BoardOptions, Size, Theme},
     crate::board::{
         print::{BoardOptions, Frame, Size, Theme},
-        Color as ChessColor, Piece, PieceName,
+        Co as ChessColor, Piece, PieceName,
     },
     lazy_static::lazy_static,
     ratatui::{

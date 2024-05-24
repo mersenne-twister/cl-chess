@@ -25,24 +25,24 @@ impl Board {
                 [
                     // Some((Piece::Rook(PieceColor::Black), false)),
                     // Some((Piece::new(PieceName::Rook, PieceColor::Black), false)),
-                    Some((Piece::new(PieceName::Rook, Color::Black), false)),
-                    Some((Piece::new(PieceName::Knight, Color::Black), false)),
-                    Some((Piece::new(PieceName::Bishop, Color::Black), false)),
-                    Some((Piece::new(PieceName::Queen, Color::Black), false)),
-                    Some((Piece::new(PieceName::King, Color::Black), false)),
-                    Some((Piece::new(PieceName::Bishop, Color::Black), false)),
-                    Some((Piece::new(PieceName::Knight, Color::Black), false)),
-                    Some((Piece::new(PieceName::Rook, Color::Black), false)),
+                    Some((Piece::new(PieceName::Rook, Co::Black), false)),
+                    Some((Piece::new(PieceName::Knight, Co::Black), false)),
+                    Some((Piece::new(PieceName::Bishop, Co::Black), false)),
+                    Some((Piece::new(PieceName::Queen, Co::Black), false)),
+                    Some((Piece::new(PieceName::King, Co::Black), false)),
+                    Some((Piece::new(PieceName::Bishop, Co::Black), false)),
+                    Some((Piece::new(PieceName::Knight, Co::Black), false)),
+                    Some((Piece::new(PieceName::Rook, Co::Black), false)),
                 ],
                 [
-                    Some((Piece::new(PieceName::Pawn, Color::Black), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::Black), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::Black), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::Black), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::Black), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::Black), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::Black), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::Black), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::Black), false)),
                 ],
                 [None, None, None, None, None, None, None, None],
                 // [None, Some((Piece::new(PieceName::Pawn, Color::White), false)), None, None, None, None, None, None],
@@ -51,24 +51,24 @@ impl Board {
                 [None, None, None, None, None, None, None, None],
                 // [None, None, None, None, None, None, None, None],
                 [
-                    Some((Piece::new(PieceName::Pawn, Color::White), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::White), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::White), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::White), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::White), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::White), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::White), false)),
-                    Some((Piece::new(PieceName::Pawn, Color::White), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::White), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::White), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::White), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::White), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::White), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::White), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::White), false)),
+                    Some((Piece::new(PieceName::Pawn, Co::White), false)),
                 ],
                 [
-                    Some((Piece::new(PieceName::Rook, Color::White), false)),
-                    Some((Piece::new(PieceName::Knight, Color::White), false)),
-                    Some((Piece::new(PieceName::Bishop, Color::White), false)),
-                    Some((Piece::new(PieceName::Queen, Color::White), false)),
-                    Some((Piece::new(PieceName::King, Color::White), false)),
-                    Some((Piece::new(PieceName::Bishop, Color::White), false)),
-                    Some((Piece::new(PieceName::Knight, Color::White), false)),
-                    Some((Piece::new(PieceName::Rook, Color::White), false)),
+                    Some((Piece::new(PieceName::Rook, Co::White), false)),
+                    Some((Piece::new(PieceName::Knight, Co::White), false)),
+                    Some((Piece::new(PieceName::Bishop, Co::White), false)),
+                    Some((Piece::new(PieceName::Queen, Co::White), false)),
+                    Some((Piece::new(PieceName::King, Co::White), false)),
+                    Some((Piece::new(PieceName::Bishop, Co::White), false)),
+                    Some((Piece::new(PieceName::Knight, Co::White), false)),
+                    Some((Piece::new(PieceName::Rook, Co::White), false)),
                 ],
                 // [
                 //     Some((Piece::Rook(PieceColor::White), false)),
@@ -209,9 +209,9 @@ impl Board {
 
                 if piece_position.num == move_position.num {
                     return (None, Some("Pawns cannot move to the side".to_owned()));
-                } else if ((piece_position.num > move_position.num) && (piece.0.color == Color::White))
+                } else if ((piece_position.num > move_position.num) && (piece.0.color == Co::White))
                 ||
-                ((piece_position.num < move_position.num) && (piece.0.color == Color::Black)) {
+                ((piece_position.num < move_position.num) && (piece.0.color == Co::Black)) {
                     return (None, Some("Pawns cannot move backwards".to_owned()));
                 }
                 // else if (move_position.num + 1) > piece_position.num {
@@ -279,7 +279,7 @@ impl Board {
                     // if normal capture, do nothing
 
                     if move_location.is_none() {
-                        let passant_pos = Position::from_literals(move_position.letter, if piece.0.color == Color::White {5} else {4});
+                        let passant_pos = Position::from_literals(move_position.letter, if piece.0.color == Co::White {5} else {4});
                         if let Some(PieceName::Pawn) = self.get_piece(&passant_pos).map(|v| v.0.name) {
                             let piece_move = self.moves.last().expect("can't reach this on the first turn");
                             if (piece_move.end_position != passant_pos) ||
@@ -762,11 +762,11 @@ impl Error for BoardError {
 #[derive(Hash, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Piece {
     pub name: PieceName,
-    pub color: Color,
+    pub color: Co,
 }
 
 impl Piece {
-    pub fn new(piece_name: PieceName, piece_color: Color) -> Self {
+    pub fn new(piece_name: PieceName, piece_color: Co) -> Self {
         Self {
             name: piece_name,
             color: piece_color,
@@ -786,7 +786,7 @@ pub enum PieceName {
 }
 
 impl Piece {
-    fn from_str(str: &str, color: Color) -> Result<Self, BoardError> {
+    fn from_str(str: &str, color: Co) -> Result<Self, BoardError> {
         match str.to_ascii_lowercase().as_str() {
             "pawn" => Ok(Piece::new(PieceName::Pawn, color)),
             "knight" => Ok(Piece::new(PieceName::Knight, color)),
@@ -824,16 +824,16 @@ impl Display for Piece {
 }
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash, Debug)]
-pub enum Color {
+pub enum Co {
     Black,
     White,
 }
 
-impl Display for Color {
+impl Display for Co {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match *self {
-            Color::White => write!(f, "White"),
-            Color::Black => write!(f, "Black"),
+            Co::White => write!(f, "White"),
+            Co::Black => write!(f, "Black"),
         }
     }
 }

@@ -1,16 +1,17 @@
 use {
-    crate::{Screen, Terminal},
+    crate::{Handle, Render, Screen, Terminal},
     crossterm::event::{Event, KeyEvent, KeyModifiers, MouseEvent},
     ratatui::{layout::Position, prelude::*, widgets::Paragraph},
     std::{cell::RefCell, rc::Rc},
     termchess_common::TResult,
     termchess_engine::board::{
         print::{BoardOptions, Size},
-        Board, Color,
+        Board,
     },
 };
 
 pub mod board;
+pub mod console;
 
 pub struct Game {
     board: Board,
@@ -39,10 +40,28 @@ impl Game {
             },
         }
     }
+
+    fn title_widget(&self) -> Paragraph {
+        Paragraph::new(Text::from("t e r m c h e s s".fg(Color::Indexed(7)).bold())).centered()
+    }
 }
 
 // #[allow(unused_variables)] // I forget why
 impl Screen for Game {
+    fn terminal(&self) -> &Rc<RefCell<Terminal>> {
+        &self.terminal
+    }
+
+    fn mouse_pos(&mut self) -> &mut Position {
+        &mut self.mouse_pos
+    }
+
+    fn exit(&self) -> bool {
+        self.exit
+    }
+}
+
+impl Render for Game {
     fn render_frame(&mut self, frame: &mut Frame) -> TResult<()> {
         let layout = Layout::default()
             .direction(Direction::Horizontal)
@@ -56,18 +75,39 @@ impl Screen for Game {
         let board_layout = Layout::default()
             .direction(Direction::Vertical)
             .constraints([
-                Constraint::Fill(3),
+                Constraint::Length(1),
+                Constraint::Length(1),
+                Constraint::Fill(1),
                 Constraint::Length(self.board_options.height() as u16),
+                Constraint::Fill(1),
+                Constraint::Length(1),
                 Constraint::Fill(1),
             ])
             .split(layout[1]);
-        self.board_pos = board_layout[1].as_position();
+        self.board_pos = board_layout[3].as_position();
 
-        frame.render_widget(self.board_widget()?, board_layout[1]);
+        let console_layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Fill(1),
+                Constraint::Length(self.board_options.width() as u16 - 10),
+                Constraint::Fill(1),
+            ])
+            .split(board_layout[5]);
+
+        frame.render_widget(self.title_widget(), board_layout[1]);
+        frame.render_widget(self.board_widget()?, board_layout[3]);
+        frame.render_widget(self.console_widget(), console_layout[1]);
 
         Ok(())
     }
 
+    fn background_color(&self) -> Color {
+        Color::Indexed(232)
+    }
+}
+
+impl Handle for Game {
     fn handle_key(&mut self, key: KeyEvent) -> TResult<()> {
         if key.modifiers == KeyModifiers::NONE {
             match key.code {
@@ -86,20 +126,11 @@ impl Screen for Game {
     fn handle_mouse(&mut self, mouse: MouseEvent) -> TResult<()> {
         // TODO: add mut mouse_pos getter, handle movement in there,
         // then separate functions for clicks?
-        self.mouse_pos = Position::new(mouse.column, mouse.row);
 
         Ok(())
     }
 
     fn handle_misc(&mut self, event: Event) -> TResult<()> {
         Ok(())
-    }
-
-    fn terminal(&self) -> &Rc<RefCell<Terminal>> {
-        &self.terminal
-    }
-
-    fn exit(&self) -> bool {
-        self.exit
     }
 }

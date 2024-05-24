@@ -4,12 +4,15 @@ use {
             self, DisableMouseCapture, EnableMouseCapture, Event, KeyEvent, KeyEventKind,
             MouseEvent,
         },
-        style::Stylize,
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
         ExecutableCommand,
     },
     menu::Menu,
-    ratatui::prelude::{Terminal as RatatuiTerminal, *},
+    ratatui::{
+        layout::Position,
+        prelude::{Terminal as RatatuiTerminal, *},
+        style::Stylize,
+    },
     std::{
         cell::RefCell,
         io::{stdout, Stdout},
@@ -90,9 +93,10 @@ impl<T: Screen> Run for T {
 
                 // let terminal = self.terminal();
                 // terminal.draw(|frame| self.render_frame(frame))?;
-                Rc::clone(self.terminal())
-                    .borrow_mut()
-                    .draw(|frame| self.render_frame(frame).unwrap())?;
+                Rc::clone(self.terminal()).borrow_mut().draw(|frame| {
+                    frame.render_widget(Text::default().bg(self.background_color()), frame.size()); //background
+                    self.render_frame(frame).unwrap();
+                })?;
             }
 
             if event::poll(Duration::from_secs(1 / 60))? {
@@ -101,8 +105,12 @@ impl<T: Screen> Run for T {
                     // stops duplicate events on windows
                     if event.kind == KeyEventKind::Press {
                         self.handle_key(event)?;
+                        // handle
+                        // handle ctrl
+                        // handle
                     }
                 } else if let Event::Mouse(event) = event {
+                    *self.mouse_pos() = Position::new(event.column, event.row);
                     self.handle_mouse(event)?;
                 } else {
                     self.handle_misc(event)?;
@@ -115,62 +123,17 @@ impl<T: Screen> Run for T {
 }
 
 // if a return is needed for any of these, make them generic over TResult<T>
-trait Screen {
-    // fn run(mut self) -> TResult<()>
-    // where
-    //     Self: Sized,
-    // {
-    //     let mut last = Instant::now();
-    //     while !self.exit() {
-    //         if Instant::now() >= last + Duration::from_secs(1 / 60) {
-    //             last = Instant::now();
-
-    //             // let terminal = self.terminal();
-    //             // terminal.draw(|frame| self.render_frame(frame))?;
-    //             Rc::clone(self.terminal())
-    //                 .borrow_mut()
-    //                 .draw(|frame| self.render_frame(frame).unwrap())?;
-    //         }
-
-    //         if event::poll(Duration::from_secs(1 / 60))? {
-    //             let event = event::read()?;
-    //             if let Event::Key(event) = event {
-    //                 // stops duplicate events on windows
-    //                 if event.kind == KeyEventKind::Press {
-    //                     self.handle_key(event)?;
-    //                 }
-    //             } else if let Event::Mouse(event) = event {
-    //                 self.handle_mouse(event)?;
-    //             } else {
-    //                 self.handle_misc(event)?;
-    //             }
-    //         }
-    //     }
-
-    //     Ok(())
-    // }
-
+trait Screen: Render + Handle {
     // run trait, implemented for all screen, which requires render, and handle
     // what does separate implementation get me?
+    // separate trait impls, which is nice
 
-    /// function to handle rendering
-    /// reccomended to use only for layout, and use getter functions for the widgets
-    fn render_frame(&mut self, frame: &mut Frame) -> TResult<()>;
-
-    /// handles all the key input
-    fn handle_key(&mut self, key: KeyEvent) -> TResult<()>;
-
-    /// handles the mouse input
-    fn handle_mouse(&mut self, mouse: MouseEvent) -> TResult<()>;
-
-    /// handles everything not key or mouse related
-    /// (guranteed not to be `KeyEvent` or `MouseEvent`)
-    fn handle_misc(&mut self, event: Event) -> TResult<()>;
-
-    ///getter for the terminal field
+    /// getter for the terminal field
     /// `Rc<RefCell<T>>` is necessary to be able to call draw on the terminal,
     /// while still mutating self in that method
     fn terminal(&self) -> &Rc<RefCell<Terminal>>;
+
+    fn mouse_pos(&mut self) -> &mut Position;
 
     /// getter determining when to exit
     fn exit(&self) -> bool;
@@ -195,4 +158,24 @@ trait Screen {
     // just pass it terminal, now that it'll have to be a field
 
     // no default contructor
+}
+
+trait Render {
+    /// function to handle rendering
+    /// reccomended to use only for layout, and use getter functions for the widgets
+    fn render_frame(&mut self, frame: &mut Frame) -> TResult<()>;
+
+    fn background_color(&self) -> Color;
+}
+
+trait Handle {
+    /// handles all the key input
+    fn handle_key(&mut self, key: KeyEvent) -> TResult<()>;
+
+    /// handles the mouse input
+    fn handle_mouse(&mut self, mouse: MouseEvent) -> TResult<()>;
+
+    /// handles everything not key or mouse related
+    /// (guranteed not to be `KeyEvent` or `MouseEvent`)
+    fn handle_misc(&mut self, event: Event) -> TResult<()>;
 }

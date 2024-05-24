@@ -5,7 +5,7 @@ use {
     crate::board::{
         self,
         ascii::{self, FrameChar, HorizSide, Tile, VertSide},
-        Board, Color as ChessColor, Piece, Position,
+        Board, Co as ChessColor, Piece, Position,
     },
     ratatui::{
         prelude::*,
