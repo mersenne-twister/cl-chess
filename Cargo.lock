@@ -821,6 +821,7 @@ dependencies = [
  "termchess-cli",
  "termchess-common",
  "termchess-engine",
+ "termchess-netcode",
  "termchess-tui",
 ]
 

@@ -12,7 +12,7 @@ use {
         io::{self, Write},
     },
     termchess_common::Args,
-    termchess_tui,
+    termchess_netcode, termchess_tui,
 };
 
 pub mod board;
@@ -21,6 +21,9 @@ pub mod parse;
 pub mod text;
 
 pub fn run(args: Args) -> Result<(), Box<dyn Error>> {
+    // termchess_netcode::lan_demo();
+    // return Ok(());
+
     let logfile = FileAppender::builder()
         .encoder(Box::new(PatternEncoder::new("{d} {l}: {m}\n")))
         .build("log/termchess.log")?;

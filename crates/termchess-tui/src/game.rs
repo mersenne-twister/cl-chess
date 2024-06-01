@@ -1,6 +1,8 @@
 use {
+    self::messages::MessageType,
     crate::{Handle, Render, Screen, Terminal},
     crossterm::event::{Event, KeyEvent, KeyModifiers, MouseEvent},
+    messages::Message,
     ratatui::{layout::Position, prelude::*, widgets::Paragraph},
     std::{cell::RefCell, rc::Rc},
     termchess_common::TResult,
@@ -12,12 +14,16 @@ use {
 
 pub mod board;
 pub mod console;
+pub mod messages;
 
 pub struct Game {
     board: Board,
+    messages: Vec<Message>,
+    console: String,
     exit: bool,
     mouse_pos: Position,
     board_pos: Position,
+    messages_width: u16,
     terminal: Rc<RefCell<Terminal>>,
     board_options: BoardOptions,
 }
@@ -26,9 +32,19 @@ impl Game {
     pub fn new(terminal: Rc<RefCell<Terminal>>) -> Self {
         Self {
             board: Board::new(),
+            messages: vec![
+                "msg1",
+                "msg2rtsaetonsrnearsotne",
+                "arsteoonei\neao\narsoten",
+            ]
+            .iter()
+            .map(|str| Message::new(MessageType::Chat, (*str).to_owned()))
+            .collect(),
+            console: String::new(),
             exit: false,
             mouse_pos: Position::default(),
             board_pos: Position::default(),
+            messages_width: 5,
             terminal,
             board_options: BoardOptions {
                 // size: Size::Letters {
@@ -67,8 +83,11 @@ impl Render for Game {
             .direction(Direction::Horizontal)
             .constraints([
                 Constraint::Fill(1),
+                Constraint::Length(1),
                 Constraint::Length(self.board_options.width() as u16),
+                Constraint::Length(1),
                 Constraint::Fill(1),
+                Constraint::Length(1),
             ])
             .split(frame.size());
 
@@ -83,7 +102,7 @@ impl Render for Game {
                 Constraint::Length(1),
                 Constraint::Fill(1),
             ])
-            .split(layout[1]);
+            .split(layout[2]);
         self.board_pos = board_layout[3].as_position();
 
         let console_layout = Layout::default()
@@ -95,9 +114,15 @@ impl Render for Game {
             ])
             .split(board_layout[5]);
 
+        let right_buffer = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([Constraint::Fill(1), Constraint::Fill(1)])
+            .split(layout[4]);
+
         frame.render_widget(self.title_widget(), board_layout[1]);
         frame.render_widget(self.board_widget()?, board_layout[3]);
         frame.render_widget(self.console_widget(), console_layout[1]);
+        frame.render_widget(self.messages_widget(), right_buffer[1]);
 
         Ok(())
     }

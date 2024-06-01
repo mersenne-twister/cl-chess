@@ -5,6 +5,6 @@ use {
 
 impl Game {
     pub fn console_widget(&self) -> Paragraph {
-        Paragraph::new(Text::from("> "))
+        Paragraph::new(Text::from(format!("> {}", self.console)))
     }
 }
