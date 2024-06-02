@@ -1,5 +1,5 @@
 use {
-    mdns_sd::{ServiceDaemon, ServiceEvent, ServiceInfo},
+    mdns_sd::{DaemonEvent, ServiceDaemon, ServiceEvent, ServiceInfo},
     std::{
         collections::HashMap,
         io,
@@ -40,40 +40,45 @@ pub fn lan_demo() {
 }
 
 fn host(mdns: &mut ServiceDaemon) {
-    let listener = TcpListener::bind(0).unwrap();
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    println!("{}", listener.local_addr().unwrap());
 
     // necessary because ServiceInfo is a tuple struct
     let service_type = "_termchess._tcp.local.";
-    let instance_name = "termchess";
+    // name of person I guess? can I specifically get this property
+    // when querying it?
+    let instance_name = "alice";
     // will be automatically set by addr_auto
     let ip = "";
-    let service_hostname = format!("{}{}", &instance_name, &service_type);
+    let service_hostname = format!("{}.local.", &instance_name);
     // get port from tcp-listener
-    let port = 0;
-    // id would go here, but that's not necessary right now
+    let port = listener.local_addr().unwrap().port();
+    // uuid and public key would go here, but that's not necessary right now
     // let properties = [("property_1", "test"), ("property_2", "1234")];
 
-    let info = ServiceInfo::new(
+    let service_info = ServiceInfo::new(
         service_type,
         instance_name,
         &service_hostname,
         ip,
         port,
-        // set status here?
-        // but it's also instance specific
         // &properties[..],
         None,
     )
     .unwrap()
     .enable_addr_auto();
 
-    // println!("{:?}", info.get_addresses());
+    let monitor = mdns.monitor().unwrap();
+    mdns.register(service_info).unwrap();
 
-    mdns.register(info).unwrap();
+    while let Ok(event) = monitor.recv() {
+        println!("Daemon event: {:?}", &event);
+        if let DaemonEvent::Error(e) = event {
+            println!("Failed: {}", e);
+            break;
+        }
+    }
 
-    // println!("{:?}", mdns.status());
-
-    thread::sleep(Duration::from_secs(10));
     mdns.shutdown().unwrap();
 }
 

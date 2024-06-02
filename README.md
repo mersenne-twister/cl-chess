@@ -12,6 +12,10 @@ This project is licensed under either of
 
 at your option.
 
+No assurance of security is made when using this application.
+Do not use this application to send passwords or other sensitive
+information.
+
 ### Contribution
 
 If you have a feature request or bug report, please open an issue on in GitHub.
