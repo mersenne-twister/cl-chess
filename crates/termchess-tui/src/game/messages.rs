@@ -59,7 +59,7 @@ impl MessageType {
 
 impl Game {
     pub fn messages_widget(&self) -> Paragraph {
-        let messages = 
+        let messages =
 // Text::from(
             self.messages
                 .iter()
@@ -67,10 +67,9 @@ impl Game {
                 .collect::<Vec<_>>();
         // );
 
-        let barrier = vec![Line::from("─".repeat( self.messages_width as usize - 2))];
+        let barrier = vec![Line::from("─".repeat(self.messages_width as usize - 2))];
 
-        Paragraph::new([messages, barrier].concat())
-        .block(
+        Paragraph::new([messages, barrier].concat()).block(
             Block::default().borders(Borders::ALL), // .padding(Padding::left(1)),
         )
     }
