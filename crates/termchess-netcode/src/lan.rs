@@ -40,7 +40,7 @@ pub fn lan_demo() {
 }
 
 fn host(mdns: &mut ServiceDaemon) {
-    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let listener = TcpListener::bind("::1:0").unwrap();
     println!("{}", listener.local_addr().unwrap());
 
     // necessary because ServiceInfo is a tuple struct
