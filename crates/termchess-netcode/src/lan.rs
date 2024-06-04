@@ -92,7 +92,7 @@ fn watch_for_endpoints(
             match event {
                 ServiceEvent::ServiceResolved(info) => {
                     // temp
-                    let ip = info.get_addresses()
+                    let ip = info.get_addresses();
                     // map.lock().unwrap().insert(
                     //     info.get_hostname()
                     //         .strip_suffix(".local.")
@@ -100,8 +100,8 @@ fn watch_for_endpoints(
                     //         .to_owned(),
                     //     SocketAddr::new(IpAddr::V6(Ipv6Addr::parse_ascii), info.get_port()),
                     // );
-                    println!("ipv6 loopback: {}\nfrom_bits: {}",
-                    );
+                    // println!("ipv6 loopback: {}\nfrom_bits: {}",
+                    // );
                 }
                 // ignore these for now, but name them explicity
                 // as a reminder of sorts
