@@ -3,7 +3,7 @@ use {
     std::{
         collections::HashMap,
         io::{self, Write},
-        net::{TcpListener, TcpStream},
+        net::{IpAddr, Ipv6Addr, SocketAddr, TcpListener, TcpStream},
         sync::{mpsc, Arc, Mutex},
         thread,
         time::Duration,
@@ -80,7 +80,7 @@ fn joust(mdns: &mut ServiceDaemon) {
 // figure out way to gracefully shutdown
 fn watch_for_endpoints(
     receiver: Receiver<ServiceEvent>,
-    map: Arc<Mutex<HashMap<String, Endpoint>>>,
+    map: Arc<Mutex<HashMap<String, SocketAddr>>>,
 ) {
     // browse for endpoints, when found,
     // add them to the hash and print them out
@@ -91,7 +91,17 @@ fn watch_for_endpoints(
         if let Ok(event) = receiver.try_recv() {
             match event {
                 ServiceEvent::ServiceResolved(info) => {
-                    //
+                    // temp
+                    let ip = info.get_addresses()
+                    // map.lock().unwrap().insert(
+                    //     info.get_hostname()
+                    //         .strip_suffix(".local.")
+                    //         .unwrap()
+                    //         .to_owned(),
+                    //     SocketAddr::new(IpAddr::V6(Ipv6Addr::parse_ascii), info.get_port()),
+                    // );
+                    println!("ipv6 loopback: {}\nfrom_bits: {}",
+                    );
                 }
                 // ignore these for now, but name them explicity
                 // as a reminder of sorts
@@ -107,11 +117,11 @@ fn watch_for_endpoints(
 }
 
 ///  holds the data for another instance of termchess
-#[derive(PartialEq, Eq, Hash)]
-struct Endpoint {
-    // name
-    // socketaddr
-}
+// #[derive(PartialEq, Eq, Hash)]
+// struct Endpoint {
+//     name: String,
+//     socketaddr: SocketAddr,
+// }
 
 // this was to try vand be able to input name OR uuid, but for final thinkg,
 // I'm just gonna need the uuid, so for now will index with name
