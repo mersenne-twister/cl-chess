@@ -93,7 +93,7 @@ fn joust(mdns: &mut ServiceDaemon) {
 
     // <(String, socketaddr?)>
     // tcpstream I think
-    let req = Arc::new(Mutex::new(None::<String>));
+    let req = Arc::new(Mutex::new(None::<(String, TcpStream)>));
 
     let _req = req.clone();
     thread::spawn(|| wait_for_connect(listener, _req));
@@ -115,7 +115,7 @@ fn joust(mdns: &mut ServiceDaemon) {
             // just pass all 4 addresses?
 
             con_name = input.trim().to_owned();
-            stream = TcpStream::connect(addr).unwrap();
+            stream = dbg!(TcpStream::connect(dbg!(&addr[..]))).unwrap();
             // stream.write(
                 bincode::encode_into_std_write(
                 Transmission::ConnectionRequest(name.clone()),
@@ -138,13 +138,22 @@ fn joust(mdns: &mut ServiceDaemon) {
     }
 }
 
-fn wait_for_connect(listener: TcpListener, req: Arc<Mutex<Option<String>>>) {
+fn wait_for_connect(listener: TcpListener, req: Arc<Mutex<Option<(String, TcpStream)>>>) {
     // wait for any connection
 
     // if we get a connection,
     // set is_req to the stream?
 
     // then on that end it gets moved out I guess
+    for stream in listener.incoming() {
+        let mut stream = stream.unwrap();
+        let trans: Transmission = bincode::decode_from_std_read(&mut stream, CONFIG).unwrap();
+        let Transmission::ConnectionRequest(name) = trans else {
+            panic!("first trans should be req");
+        };
+        println!("{} is trying to connect. Join? (y/n)", name);
+        *req.lock().unwrap() = Some((name, stream));
+    }
 }
 
 #[derive(Encode, Decode)]
@@ -156,7 +165,7 @@ enum Transmission {
 // figure out way to gracefully shutdown
 fn watch_for_endpoints(
     receiver: Receiver<ServiceEvent>,
-    map: Arc<Mutex<HashMap<String, SocketAddr>>>,
+    map: Arc<Mutex<HashMap<String, Vec<SocketAddr>>>>,
     own_name: String,
 ) {
     // println!("test!");
@@ -186,21 +195,27 @@ fn watch_for_endpoints(
                         continue;
                     }
 
-                    let Some(ip) = info.get_addresses().iter().find(|ip| {
-                        // println!("ip: {}", ip);
-                        match **ip {
-                            IpAddr::V6(ip) => {
-                                // println!(
-                                //     "is_unicast_link_local: {}",
-                                //     ip.is_unicast_link_local()
-                                // );
-                                ip.is_unicast_link_local()
-                            }
-                            IpAddr::V4(_) => false,
-                        }
-                    }) else {
+                    // let Some(ip) = info.get_addresses().iter().find(|ip| {
+                    //     // println!("ip: {}", ip);
+                    //     match **ip {
+                    //         IpAddr::V6(ip) => {
+                    //             // println!(
+                    //             //     "is_unicast_link_local: {}",
+                    //             //     ip.is_unicast_link_local()
+                    //             // );
+                    //             ip.is_unicast_link_local()
+                    //         }
+                    //         IpAddr::V4(_) => false,
+                    //     }
+                    // }) else {
+                    //     continue;
+                    // };
+                    if info.get_addresses().len() < 4 {
                         continue;
-                    };
+                    }
+
+                    let addrs: Vec<SocketAddr> = info.get_addresses().iter().map(|addr| SocketAddr::new(addr.to_owned(), info.get_port())).collect();
+                    // let addrs: Vec<SocketAddr> = info.get_addresses().iter().map(|addr| SocketAddr::new(IpAddr::V6(Ipv6Addr::LOCALHOST), info.get_port())).collect();
 
                     println!("Found player: {}.", name);
                     // for ip in info.get_addresses() {
@@ -208,7 +223,7 @@ fn watch_for_endpoints(
                     // }
                     map.lock()
                         .unwrap()
-                        .insert(name, SocketAddr::new(ip.to_owned(), info.get_port()));
+                        .insert(name, addrs);
                     // println!(
                     //     "to_string: {}\nfrom_bits: {}",
                     //     Ipv6Addr::from_bits(
