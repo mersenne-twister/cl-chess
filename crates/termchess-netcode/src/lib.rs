@@ -1,3 +1,5 @@
+#![feature(ip)]
+
 pub mod client;
 pub mod lan;
 
