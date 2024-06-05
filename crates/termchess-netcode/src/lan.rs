@@ -14,6 +14,8 @@ use {
 const CONFIG: Configuration = config::standard();
 
 pub fn lan_demo() {
+    // println!("socketaddr: {}", TcpListener::bind("::1:0").unwrap().local_addr().unwrap());
+    // return;
     let mut mdns = ServiceDaemon::new().unwrap();
 
     joust(&mut mdns);
@@ -146,6 +148,7 @@ fn wait_for_connect(listener: TcpListener, req: Arc<Mutex<Option<(String, TcpStr
 
     // then on that end it gets moved out I guess
     for stream in listener.incoming() {
+        println!("Got connection");
         let mut stream = stream.unwrap();
         let trans: Transmission = bincode::decode_from_std_read(&mut stream, CONFIG).unwrap();
         let Transmission::ConnectionRequest(name) = trans else {
@@ -178,6 +181,7 @@ fn watch_for_endpoints(
         if let Ok(event) = receiver.try_recv() {
             match event {
                 ServiceEvent::ServiceResolved(info) => {
+                    let mut map = map.lock().unwrap();
                     // temp
                     // let ip = info
                     //     .get_addresses()
@@ -191,7 +195,15 @@ fn watch_for_endpoints(
                         .trim()
                         .to_owned();
                     // println!("name: {}\nown_name: {}", name, own_name);
-                    if name == own_name || map.lock().unwrap().contains_key(&name) {
+
+                    let addrs: Vec<SocketAddr> = info.get_addresses().iter().map(|addr| SocketAddr::new(addr.to_owned(), info.get_port())).collect();
+
+                    if name == own_name  {
+                        continue;
+                    } else if map.contains_key(&name) {
+                        if addrs.len() > map.get(&name).unwrap().len() {
+                            *map.get_mut(&name).unwrap() = addrs;
+                        }
                         continue;
                     }
 
@@ -210,9 +222,9 @@ fn watch_for_endpoints(
                     // }) else {
                     //     continue;
                     // };
-                    if info.get_addresses().len() < 4 {
-                        continue;
-                    }
+                    // if info.get_addresses().len() < 4 {
+                    //     continue;
+                    // }
 
                     let addrs: Vec<SocketAddr> = info.get_addresses().iter().map(|addr| SocketAddr::new(addr.to_owned(), info.get_port())).collect();
                     // let addrs: Vec<SocketAddr> = info.get_addresses().iter().map(|addr| SocketAddr::new(IpAddr::V6(Ipv6Addr::LOCALHOST), info.get_port())).collect();
@@ -221,8 +233,7 @@ fn watch_for_endpoints(
                     // for ip in info.get_addresses() {
                     //     println!("ip: {}", ip);
                     // }
-                    map.lock()
-                        .unwrap()
+                    map
                         .insert(name, addrs);
                     // println!(
                     //     "to_string: {}\nfrom_bits: {}",
