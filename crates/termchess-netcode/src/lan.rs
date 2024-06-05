@@ -1,4 +1,5 @@
 use {
+    local_ip_address,
     bincode::{self, config::{self, Configuration}, Encode, Decode},
     mdns_sd::{DaemonEvent, Receiver, ServiceDaemon, ServiceEvent, ServiceInfo},
     std::{
@@ -86,6 +87,8 @@ fn joust(mdns: &mut ServiceDaemon) {
     let _name = name.clone();
     thread::spawn(|| watch_for_endpoints(receiver, _map, _name));
 
+    println!("local_ip: {:?}", local_ip_address::local_ip().unwrap());
+
     // 2 things:
     // listen in another thread for a request to contact
     // if user enters name, make request to contact
@@ -96,6 +99,8 @@ fn joust(mdns: &mut ServiceDaemon) {
     // <(String, socketaddr?)>
     // tcpstream I think
     let req = Arc::new(Mutex::new(None::<(String, TcpStream)>));
+
+    println!("local_addr: {}", listener.local_addr().unwrap());
 
     let _req = req.clone();
     thread::spawn(|| wait_for_connect(listener, _req));
